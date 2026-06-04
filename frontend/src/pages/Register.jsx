@@ -1,23 +1,32 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm();
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    } = useForm({
+        defaultValues: {
+        name: "",
+        email: "",
+        password: "",
+        },
+    });
+
     const onSubmit = async (data) => {
         console.log(data);
+
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     };
-     const handleToggle = () => {
-        setShowPassword((prev) => !prev);
-    };
+
     return (
         <div className="min-h-screen bg-[#21313F] flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-[#F7F8F6] backdrop-blur-md rounded-3xl shadow-xl p-8">
+        <div className="w-full max-w-md bg-[#F7F8F6] rounded-3xl shadow-xl p-8">
             <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">
                 Create Account
@@ -28,23 +37,27 @@ export default function Register() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Name */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
                 </label>
+
                 <input
+                type="text"
+                placeholder="Enter your name"
                 {...register("name", {
                     required: "Name is required",
                     minLength: {
                     value: 3,
-                    message: "At least 3 characters",
+                    message: "Name must be at least 3 characters",
                     },
                 })}
-                placeholder="Enter Name.."
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F] transition"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F]"
                 />
+
                 {errors.name && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="mt-1 text-sm text-red-500">
                     {errors.name.message}
                 </p>
                 )}
@@ -55,20 +68,22 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email
                 </label>
+
                 <input
                 type="email"
+                placeholder="name@example.com"
                 {...register("email", {
                     required: "Email is required",
                     pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: "Enter a valid email",
+                    value: /^\S+@\S+\.\S+$/,
+                    message: "Enter a valid email address",
                     },
                 })}
-                placeholder="name@example.com"
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F] transition"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F]"
                 />
+
                 {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="mt-1 text-sm text-red-500">
                     {errors.email.message}
                 </p>
                 )}
@@ -79,30 +94,39 @@ export default function Register() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
                 </label>
+
+                <div className="relative">
                 <input
-                type={showPassword ? 'text' : 'password'} 
-                {...register("password", {
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    {...register("password", {
                     required: "Password is required",
                     minLength: {
-                    value: 8,
-                    message: "Minimum 8 characters",
+                        value: 8,
+                        message: "Password must be at least 8 characters",
                     },
-                })}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F] transition"
+                    })}
+                    className="w-full px-4 py-3 pr-12 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#21313F]"
                 />
+
                 <button
-                type="button" // Prevents form submission when clicked
-                onClick={handleToggle}
-                style=''
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                    }
                 >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? (
+                    <EyeOff size={20} />
+                    ) : (
+                    <Eye size={20} />
+                    )}
                 </button>
+                </div>
+
                 {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="mt-1 text-sm text-red-500">
                     {errors.password.message}
                 </p>
                 )}
@@ -111,7 +135,7 @@ export default function Register() {
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-2xl bg-[#877D7A] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
+                className="w-full py-3 rounded-2xl bg-[#877D7A] text-white font-semibold shadow-lg transition hover:opacity-90 disabled:opacity-60"
             >
                 {isSubmitting ? "Creating..." : "Create Account"}
             </button>
@@ -119,7 +143,7 @@ export default function Register() {
 
             <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?
-            <span className="text-[#7F8084] font-medium cursor-pointer ml-1">
+            <span className="ml-1 text-[#7F8084] font-medium cursor-pointer hover:underline">
                 Sign In
             </span>
             </p>
