@@ -14,7 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.example.backend.exception.CustomExceptionHandler;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,8 @@ public class AuthService {
     private final AuthenticationManager am;
     public AuthResponse register(RegisterRequest r) {
         if(userRepo.existsByEmail(r.getEmail())) {
-            throw new IllegalArgumentException("Email already registered: " + r.getEmail());
+//            throw new ResponseStatusException(HttpStatus.CONFLICT,"Email already registered: " + r.getEmail());
+            throw new CustomExceptionHandler("Email already exists");
         }
         User u = User.builder().email(r.getEmail()).name(r.getName()).passwordHash(enc.encode(r.getPassword()))
                 .roles(new java.util.HashSet<>(Set.of(Role.ENGINEER))).build();
