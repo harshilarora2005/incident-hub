@@ -1,6 +1,6 @@
 package com.example.backend.exception;
 
-import com.example.backend.entity.ErrorDetails;
+import com.example.backend.dtos.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomExceptionHandler.class)
     public ResponseEntity<ErrorDetails> handleResourceNotFound(CustomExceptionHandler ex) {
-        HttpStatus status = HttpStatus.NOT_FOUND; // 404 Status
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
         ErrorDetails errorDetails = new ErrorDetails(
                 status.value(),

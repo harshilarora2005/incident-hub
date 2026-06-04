@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.entity.AppUserDetails;
+import com.example.backend.dtos.AppUserDetails;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
