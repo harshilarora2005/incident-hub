@@ -1,6 +1,5 @@
-package com.example.backend.dtos;
+package com.example.backend.entity;
 
-import com.example.backend.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
