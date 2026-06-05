@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router";
+import { RegisterUser } from "../api/authApi";
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -19,9 +20,13 @@ export default function Register() {
 
     const onSubmit = async (data) => {
         console.log(data);
+        try{
+            const result = await RegisterUser(data);
+            console.log(result);
+        }
+        catch(error){
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
     };
 
     return (
