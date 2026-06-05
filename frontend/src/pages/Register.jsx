@@ -4,7 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerUser } from "../api/authApi";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
