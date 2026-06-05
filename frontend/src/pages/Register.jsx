@@ -4,9 +4,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerUser } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
+    const { refreshUser } = useAuth();
     const navigate = useNavigate();
     const {
         register,
@@ -32,7 +34,7 @@ export default function Register() {
                         "Failed to create account",
                 }
             );
-
+            await refreshUser();
             navigate("/");
         } catch (error) {
             console.error(error);

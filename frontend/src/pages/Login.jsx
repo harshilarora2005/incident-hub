@@ -4,9 +4,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginUser } from "../api/authApi";
-
+import { useAuth } from "../context/AuthContext";
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const { refreshUser } = useAuth();
     const navigate = useNavigate();
     const {
         register,
@@ -21,8 +22,9 @@ export default function Login() {
 
     const onSubmit = async (data) => {
         try {
+            // eslint-disable-next-line no-unused-vars
             const result = await loginUser(data);
-            console.log(result)
+            await refreshUser();
             toast.success("Welcome back!");
 
             navigate("/");
