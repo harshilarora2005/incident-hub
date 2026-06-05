@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadUser();
     }, []);
 
@@ -29,7 +30,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         refreshUser: loadUser,
     };
-
+    
     return (
         <AuthContext.Provider value={value}>
             {children}
