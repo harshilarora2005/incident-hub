@@ -53,6 +53,18 @@ public class AuthService {
         return createAuthResponse(user, response);
     }
 
+    public void logout(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie
+                .from("access_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
     public AuthResponse getCurrentUser(Authentication authentication) {
         String email = authentication.getName();
         User user = userRepo.findByEmail(email).orElseThrow(() -> new CustomExceptionHandler("User not found"));
