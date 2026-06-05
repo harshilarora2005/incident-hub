@@ -1,6 +1,5 @@
 import './App.css'
 import { Outlet } from "react-router";
-import Register from './pages/Register'
 import { Toaster } from "sonner";
 function App() {
 

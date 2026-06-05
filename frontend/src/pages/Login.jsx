@@ -21,20 +21,18 @@ export default function Login() {
 
     const onSubmit = async (data) => {
         try {
-            await toast.promise(
-                loginUser(data),
-                {
-                    loading: "Signing you in...",
-                    success: "Welcome back!",
-                    error: (error) =>
-                        error.response?.data?.message ||
-                        "Invalid email or password",
-                }
-            );
+            const result = await loginUser(data);
+            console.log(result)
+            toast.success("Welcome back!");
 
-            navigate("/");
+            // navigate("/");
         } catch (error) {
-            console.error(error);
+            console.log(error);
+
+            toast.error(
+                error.response?.data?.message ||
+                "Invalid email or password"
+            );
         }
     };
 
