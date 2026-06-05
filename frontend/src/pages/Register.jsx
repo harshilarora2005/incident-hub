@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
-
+import { Link } from "react-router";
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -143,9 +143,9 @@ export default function Register() {
 
             <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?
-            <span className="ml-1 text-[#7F8084] font-medium cursor-pointer hover:underline">
+            <Link to='/login' className="ml-1 text-[#7F8084] font-medium cursor-pointer hover:underline">
                 Sign In
-            </span>
+            </Link>
             </p>
         </div>
         </div>

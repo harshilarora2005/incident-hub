@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
-
+import { Link } from "react-router";
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
-
     const {
-        login,
+        register,
         handleSubmit,
         formState: { errors, isSubmitting },
     } = useForm({
@@ -19,7 +18,6 @@ export default function Login() {
     const onSubmit = async (data) => {
         console.log(data);
 
-        // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1000));
     };
 
@@ -41,7 +39,7 @@ export default function Login() {
                 <input
                 type="email"
                 placeholder="name@example.com"
-                {...login("email", {
+                {...register("email", {
                     required: "Email is required",
                     pattern: {
                     value: /^\S+@\S+\.\S+$/,
@@ -67,7 +65,7 @@ export default function Login() {
                 <input
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    {...login("password", {
+                    {...register("password", {
                     required: "Password is required",
                     minLength: {
                         value: 8,
@@ -111,9 +109,9 @@ export default function Login() {
 
             <p className="text-center text-sm text-gray-500 mt-6">
             Don't have an account?
-            <span className="ml-1 text-[#7F8084] font-medium cursor-pointer hover:underline">
-                Log In
-            </span>
+            <Link to="/register" className="ml-1 text-[#7F8084] font-medium cursor-pointer hover:underline">
+                Sign up
+            </Link>
             </p>
         </div>
         </div>
