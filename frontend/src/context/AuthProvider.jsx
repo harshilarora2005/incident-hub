@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import AuthContext from "./AuthContext";
 import { getCurrentUser } from "../api/authApi";
+import { logoutUser } from "../api/authApi";
 
 export default function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -18,6 +19,13 @@ export default function AuthProvider({ children }) {
         }
     };
 
+    const logout = async () => {
+        try {
+            await logoutUser();
+        } finally {
+            setUser(null);
+        }
+    };
     useEffect(() => {
         loadUser();
     }, []);
@@ -28,6 +36,7 @@ export default function AuthProvider({ children }) {
         loading,
         isAuthenticated: !!user,
         refreshUser: loadUser,
+        logout
     };
 
     return (
