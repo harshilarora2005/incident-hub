@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { RegisterUser } from "../api/authApi";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
-    const [serverError, setServerError] = useState("");
-
     const navigate = useNavigate();
     const {
         register,
@@ -22,26 +21,27 @@ export default function Register() {
     });
 
     const onSubmit = async (data) => {
-        setServerError("");
         try {
-            const user = await RegisterUser(data);
-
-            console.log("Registered:", user);
+            await toast.promise(
+                RegisterUser(data),
+                {
+                    loading: "Creating your account...",
+                    success: "Account created successfully!",
+                    error: (error) =>
+                        error.response?.data?.message ||
+                        "Failed to create account",
+                }
+            );
 
             navigate("/");
         } catch (error) {
-            setServerError(
-                error.response?.data?.message ||
-                error.response?.data ||
-                "Unable to create account. Please try again."
-            );
+            console.error(error);
         }
     };
 
     return (
         <div className="min-h-screen bg-[#21313F] flex items-center justify-center p-6">
             <div className="w-full max-w-md bg-[#F7F8F6] rounded-3xl shadow-xl p-8">
-
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800">
                         Create Account
@@ -56,7 +56,6 @@ export default function Register() {
                     onSubmit={handleSubmit(onSubmit)}
                     className="space-y-5"
                 >
-
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Full Name
@@ -142,6 +141,11 @@ export default function Register() {
                                     )
                                 }
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                aria-label={
+                                    showPassword
+                                        ? "Hide password"
+                                        : "Show password"
+                                }
                             >
                                 {showPassword ? (
                                     <EyeOff size={20} />
@@ -158,35 +162,22 @@ export default function Register() {
                         )}
                     </div>
 
-                    {serverError && (
-                        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                            {serverError}
-                        </div>
-                    )}
-
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full py-3 rounded-2xl bg-[#877D7A] text-white font-semibold shadow-lg transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting ? (
-                            <span className="flex items-center justify-center gap-2">
-                                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                Creating Account...
-                            </span>
-                        ) : (
-                            "Create Account"
-                        )}
+                        {isSubmitting
+                            ? "Creating..."
+                            : "Create Account"}
                     </button>
                 </form>
 
                 <p className="text-center text-sm text-gray-500 mt-6">
                     Already have an account?
-
                     <Link
                         to="/login"
-                        className="ml-1 text-[#7F8084] font-medium hover:underline"
-                    >
+                        className="ml-1 text-[#7F8084] font-medium hover:underline">
                         Sign In
                     </Link>
                 </p>
