@@ -1,9 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from "react";
+import AuthContext from "./AuthContext";
 import { getCurrentUser } from "../api/authApi";
 
-const AuthContext = createContext(null);
-
-export function AuthProvider({ children }) {
+export default function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -19,7 +19,6 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadUser();
     }, []);
 
@@ -30,22 +29,10 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         refreshUser: loadUser,
     };
-    
+
     return (
         <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
-}
-
-export function useAuth() {
-    const context = useContext(AuthContext);
-
-    if (!context) {
-        throw new Error(
-            "useAuth must be used inside AuthProvider"
-        );
-    }
-
-    return context;
 }
