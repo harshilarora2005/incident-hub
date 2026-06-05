@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { RegisterUser } from "../api/authApi";
+import { registerUser } from "../api/authApi";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +23,7 @@ export default function Register() {
     const onSubmit = async (data) => {
         try {
             await toast.promise(
-                RegisterUser(data),
+                registerUser(data),
                 {
                     loading: "Creating your account...",
                     success: "Account created successfully!",
