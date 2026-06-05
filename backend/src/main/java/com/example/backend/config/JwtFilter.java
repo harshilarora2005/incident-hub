@@ -3,6 +3,7 @@ package com.example.backend.config;
 import com.example.backend.service.AppUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,49 +24,35 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AppUserDetailsService uds;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
-    ) throws ServletException, IOException {
-
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String token = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("access_token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String token = authHeader.substring(7);
-
         try {
-
             String email = jwt.extractEmail(token);
-
-            if (email != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null &&
-                    jwt.isTokenValid(token)) {
-
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null && jwt.isTokenValid(token)) {
                 UserDetails userDetails =
                         uds.loadUserByUsername(email);
-
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
         } catch (Exception ignored) {
             // invalid token
         }
-
         filterChain.doFilter(request, response);
     }
 }

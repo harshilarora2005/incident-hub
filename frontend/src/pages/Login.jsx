@@ -25,7 +25,7 @@ export default function Login() {
             console.log(result)
             toast.success("Welcome back!");
 
-            // navigate("/");
+            navigate("/");
         } catch (error) {
             console.log(error);
 
