@@ -4,24 +4,30 @@ import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.LoginRequest;
 import com.example.backend.dtos.RegisterRequest;
 import com.example.backend.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService auth;
+    private final AuthService authService;
     @PostMapping("/register")
-    public AuthResponse register(@Valid @RequestBody RegisterRequest r) {
-        return auth.register(r);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(
+                authService.register(request, response)
+        );
     }
+
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest r) {
-        return auth.login(r);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(
+                authService.login(request, response)
+        );
     }
 }
