@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
-        if (token == null) {
+        if (token == null || token.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }

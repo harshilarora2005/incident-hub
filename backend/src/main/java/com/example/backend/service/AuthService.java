@@ -66,6 +66,9 @@ public class AuthService {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
     public AuthResponse getCurrentUser(Authentication authentication) {
+        if (authentication == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is null");
+        }
         String email = authentication.getName();
         User user = userRepo.findByEmail(email).orElseThrow(() -> new CustomExceptionHandler("User not found"));
         return new AuthResponse(

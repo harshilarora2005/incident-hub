@@ -32,18 +32,13 @@ public class AuthController {
     }
     @GetMapping("/me")
     public ResponseEntity<AuthResponse> me(Authentication authentication) {
-        return ResponseEntity.ok(
-                authService.getCurrentUser(authentication)
-        );
+        System.out.println(authentication);
+        return ResponseEntity.ok(authService.getCurrentUser(authentication));
     }
-    
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            HttpServletResponse response
-    ) {
-
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
         authService.logout(response);
-
         return ResponseEntity.noContent().build();
     }
 }
