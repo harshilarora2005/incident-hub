@@ -8,7 +8,6 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class AuthResponse {
-//    private String token;
     Long userId;
     private String name;
     private String email;

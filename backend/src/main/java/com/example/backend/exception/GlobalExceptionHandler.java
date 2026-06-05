@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,5 +21,17 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorDetails, status);
+    }
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorDetails> handleResponseStatusException(ResponseStatusException ex) {
+        ErrorDetails error = new ErrorDetails(
+                ex.getStatusCode().value(),
+                ex.getStatusCode().toString(),
+                ex.getReason()
+        );
+
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(error);
     }
 }

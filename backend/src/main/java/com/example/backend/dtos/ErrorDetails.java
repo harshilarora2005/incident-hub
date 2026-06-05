@@ -1,7 +1,11 @@
 package com.example.backend.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter @Setter
 public class ErrorDetails {
     private LocalDateTime timestamp;
     private int status;
@@ -14,10 +18,4 @@ public class ErrorDetails {
         this.error = error;
         this.message = message;
     }
-
-    // Getters and Setters
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public int getStatus() { return status; }
-    public String getError() { return error; }
-    public String getMessage() { return message; }
 }

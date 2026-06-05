@@ -24,20 +24,20 @@ export default function Register() {
 
     const onSubmit = async (data) => {
         try {
-            await toast.promise(
-                registerUser(data),
-                {
-                    loading: "Creating your account...",
-                    success: "Account created successfully!",
-                    error: (error) =>
-                        error.response?.data?.message ||
-                        "Failed to create account",
-                }
-            );
+            await registerUser(data);
             await refreshUser();
+            toast.success(
+                "Account created successfully!"
+            );
+            await new Promise((resolve) =>
+                setTimeout(resolve, 2500)
+            );
             navigate("/");
         } catch (error) {
-            console.error(error);
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to create account"
+            );
         }
     };
 

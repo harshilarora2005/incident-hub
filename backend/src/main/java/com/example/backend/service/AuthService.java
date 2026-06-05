@@ -46,9 +46,9 @@ public class AuthService {
     }
     public AuthResponse login(LoginRequest r, HttpServletResponse response) {
         User user = userRepo.findByEmail(r.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
         if (!enc.matches(r.getPassword(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
         return createAuthResponse(user, response);
     }

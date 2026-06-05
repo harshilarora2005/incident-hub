@@ -1,0 +1,9 @@
+Tasks:-
+
+> Created workflow for the project
+> Created basic user entity to store user details
+> Created User repository 
+> Exposed register and login endpoints
+> Added JWT functionality
+> Tested endpoints using PostMan
+> 
