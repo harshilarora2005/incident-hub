@@ -9,7 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -28,6 +28,12 @@ public class AuthController {
             HttpServletResponse response) {
         return ResponseEntity.ok(
                 authService.login(request, response)
+        );
+    }
+    @GetMapping("/me")
+    public ResponseEntity<AuthResponse> me(Authentication authentication) {
+        return ResponseEntity.ok(
+                authService.getCurrentUser(authentication)
         );
     }
 }

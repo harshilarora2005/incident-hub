@@ -17,7 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.security.core.Authentication;
 import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,6 +51,17 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
         return createAuthResponse(user, response);
+    }
+
+    public AuthResponse getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepo.findByEmail(email).orElseThrow(() -> new CustomExceptionHandler("User not found"));
+        return new AuthResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getRoles()
+        );
     }
 
     private AuthResponse createAuthResponse(User user, HttpServletResponse response) {
