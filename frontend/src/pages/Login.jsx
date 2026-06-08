@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginUser } from "../api/authApi";
 import useAuth from "../hooks/useAuth";
+import GoogleIcon from "../assets/GoogleIcon";
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const { refreshUser } = useAuth();
@@ -139,7 +140,22 @@ export default function Login() {
                             : "Log In"}
                     </button>
                 </form>
-
+ <div className="flex items-center gap-3 my-5">
+                    <span className="flex-1 h-px bg-[#DDD8CE]" />
+                    <span className="text-[0.7rem] font-semibold tracking-widest uppercase text-[#8A9BAA]">or</span>
+                    <span className="flex-1 h-px bg-[#DDD8CE]" />
+                </div>
+                <button
+                    type="button"
+                    onClick={() => {
+                    window.location.href =
+                        "http://localhost:8080/oauth2/authorization/google";
+                    }}
+                    className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-[#DDD8CE] bg-white hover:bg-[#F5F0E8] hover:border-[#C4B9AE] text-[#1C2B3A] text-sm font-medium shadow-sm transition-all duration-150"
+                >
+                    <GoogleIcon/>
+                    Continue with Google
+                </button>
                 <p className="text-center text-sm text-gray-500 mt-6">
                     Don't have an account?
 

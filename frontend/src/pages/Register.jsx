@@ -153,6 +153,10 @@ export default function Register() {
                 </div>
                 <button
                     type="button"
+                    onClick={() => {
+                    window.location.href =
+                        "http://localhost:8080/oauth2/authorization/google";
+                    }}
                     className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl border border-[#DDD8CE] bg-white hover:bg-[#F5F0E8] hover:border-[#C4B9AE] text-[#1C2B3A] text-sm font-medium shadow-sm transition-all duration-150"
                 >
                     <GoogleIcon/>
