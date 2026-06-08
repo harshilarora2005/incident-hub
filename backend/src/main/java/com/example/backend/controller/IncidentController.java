@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class IncidentController {
     private final IncidentService service;
+    private final CurrentUser user;
     private final
     @PostMapping
     public IncidentDetails create(@Valid @RequestBody IncidentDetails incidentDetails) {
-        return service.create(incidentDetails);
+        return service.create(incidentDetails,user.get());
     }
 
 }
