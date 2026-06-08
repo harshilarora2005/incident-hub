@@ -5,10 +5,9 @@ import com.example.backend.dtos.IncidentDetails;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/incidents")
@@ -17,6 +16,10 @@ public class IncidentController {
     private final IncidentService service;
     private final CurrentUser user;
 
+    @GetMapping
+    public List<IncidentDetails> list(){
+        return service.findAll();
+    }
     @PostMapping
     public IncidentDetails create(@Valid @RequestBody CreateRequest req) {
         return service.create(req,user.get());

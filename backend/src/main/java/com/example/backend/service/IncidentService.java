@@ -12,6 +12,10 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +40,13 @@ public class IncidentService {
         incident= incidents.save(incident);
         IncidentDetails inc = mapper.toDto(incident);
         return inc;
+    }
+    @Transactional(readOnly = true)
+    public List<IncidentDetails> findAll() {
+        return incidents.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
 }
