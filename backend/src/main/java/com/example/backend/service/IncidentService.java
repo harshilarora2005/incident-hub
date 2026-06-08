@@ -6,6 +6,7 @@ import com.example.backend.entity.Incident;
 import com.example.backend.entity.IncidentPriority;
 import com.example.backend.entity.IncidentStatus;
 import com.example.backend.entity.User;
+import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.IncidentMapper;
 import com.example.backend.repository.IncidentRepository;
 import com.example.backend.repository.UserRepository;
@@ -24,6 +25,15 @@ public class IncidentService {
     private final UserRepository users;
     private final IncidentMapper mapper;
     public IncidentDetails create(CreateRequest r, User reporter) {
+        User as = null;
+        if (r.getAssigneeId() != null) {
+            as = users.findById(r.getAssigneeId())
+                    .orElseThrow(() ->
+                            new CustomExceptionHandler(
+                                    "User with id " + r.getAssigneeId() + " not found"
+                            )
+                    );
+        }
         Incident incident = Incident.builder()
                 .title(r.getTitle())
                 .description(r.getDescription())
@@ -32,9 +42,7 @@ public class IncidentService {
                 )
                 .status(IncidentStatus.OPEN)
                 .reporter(reporter)
-                .assignee(
-                        r.getAssigneeId() == null? null : users.findById(r.getAssigneeId()).orElse(null)
-                )
+                .assignee(as)
                 .build();
         System.out.println(incident);
         incident= incidents.save(incident);
@@ -47,6 +55,19 @@ public class IncidentService {
                 .stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public IncidentDetails findById(Long id) {
+        return mapper.toDto(incidents.findById(id).orElseThrow(() ->
+                new CustomExceptionHandler(
+                        "Incident with id " + id + " not found"
+                )
+        ));
+    }
+
+    public void delete(Long id) {
+
     }
 
 }

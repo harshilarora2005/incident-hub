@@ -24,5 +24,9 @@ public class IncidentController {
     public IncidentDetails create(@Valid @RequestBody CreateRequest req) {
         return service.create(req,user.get());
     }
+    @GetMapping("/{id}")
+    public IncidentDetails findById(@PathVariable Long id){
+        return service.findById(id);
+    }
 
 }
