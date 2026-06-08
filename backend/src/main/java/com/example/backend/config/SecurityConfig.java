@@ -26,6 +26,7 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final AppUserDetailsService uds;
+    private final OAuth2SuccessHandler oas;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -78,6 +79,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/me")
                         .authenticated()
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth -> oauth
+                        .successHandler(oas)
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
