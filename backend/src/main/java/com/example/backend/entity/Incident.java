@@ -35,14 +35,20 @@ public class Incident {
         @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="assignee_id")
         private User assignee;
 
-        @Builder.Default
         @Column(name="created_at", nullable=false)
         private Instant createdAt = Instant.now();
 
         @Column(name="updated_at", nullable=false)
         private Instant updatedAt = Instant.now();
 
-        @PreUpdate void touch() {
-            this.updatedAt = Instant.now();
+        @PrePersist
+        public void onCreate() {
+            createdAt = Instant.now();
+            updatedAt = Instant.now();
+        }
+
+        @PreUpdate
+        public void onUpdate() {
+            updatedAt = Instant.now();
         }
 }

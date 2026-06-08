@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class IncidentController {
     private final IncidentService service;
     private final CurrentUser user;
-    private final
+
     @PostMapping
-    public IncidentDetails create(@Valid @RequestBody IncidentDetails incidentDetails) {
-        return service.create(incidentDetails,user.get());
+    public IncidentDetails create(@Valid @RequestBody CreateRequest req) {
+        return service.create(req,user.get());
     }
 
 }
