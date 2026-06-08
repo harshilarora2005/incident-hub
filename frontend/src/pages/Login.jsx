@@ -51,15 +51,11 @@ export default function Login() {
                     </p>
                 </div>
 
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="space-y-5"
-                >
+                <form onSubmit={handleSubmit(onSubmit)}className="space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Email
                         </label>
-
                         <input
                             type="email"
                             placeholder="name@example.com"
@@ -80,12 +76,10 @@ export default function Login() {
                             </p>
                         )}
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Password
                         </label>
-
                         <div className="relative">
                             <input
                                 type={
