@@ -2,10 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
-import com.example.backend.entity.Incident;
-import com.example.backend.entity.IncidentPriority;
-import com.example.backend.entity.IncidentStatus;
-import com.example.backend.entity.User;
+import com.example.backend.entity.*;
 import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.IncidentMapper;
 import com.example.backend.repository.IncidentRepository;
@@ -14,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,27 +22,37 @@ public class IncidentService {
     private final UserRepository users;
     private final IncidentMapper mapper;
     public IncidentDetails create(CreateRequest r, User reporter) {
-        User as = null;
-        if (r.getAssigneeId() != null) {
-            as = users.findById(r.getAssigneeId())
-                    .orElseThrow(() ->
-                            new CustomExceptionHandler(
-                                    "User with id " + r.getAssigneeId() + " not found"
-                            )
-                    );
+        Set<User> assignees = new HashSet<>();
+        if (r.getAssigneeIds() != null && !r.getAssigneeIds().isEmpty()) {
+            List<User> usersFound = users.findAllById(r.getAssigneeIds());
+            if (usersFound.size() != r.getAssigneeIds().size()) {
+                throw new CustomExceptionHandler(
+                        "One or more assignees were not found"
+                );
+            }
+            assignees.addAll(usersFound);
         }
         Incident incident = Incident.builder()
                 .title(r.getTitle())
                 .description(r.getDescription())
                 .priority(
-                        r.getPriority() == null ? IncidentPriority.MEDIUM : r.getPriority()
+                        r.getPriority() == null
+                                ? IncidentPriority.MEDIUM
+                                : r.getPriority()
                 )
+                .category(
+                        r.getCategory() == null
+                                ? IncidentCategory.GENERAL
+                                : r.getCategory()
+                )
+                .dueAt(r.getDueAt())
                 .status(IncidentStatus.OPEN)
+                .progress(0)
                 .reporter(reporter)
-                .assignee(as)
+                .assignees(assignees)
                 .build();
-        System.out.println(incident);
-        incident= incidents.save(incident);
+
+        incident = incidents.save(incident);
         IncidentDetails inc = mapper.toDto(incident);
         return inc;
     }

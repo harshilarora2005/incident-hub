@@ -26,10 +26,6 @@ public class Incident {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentSeverity severity = IncidentSeverity.MEDIUM;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private IncidentPriority priority = IncidentPriority.MEDIUM;
 
     @Enumerated(EnumType.STRING)

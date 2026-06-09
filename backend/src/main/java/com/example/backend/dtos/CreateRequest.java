@@ -1,16 +1,20 @@
 package com.example.backend.dtos;
 
+import com.example.backend.entity.IncidentCategory;
 import com.example.backend.entity.IncidentPriority;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.time.Instant;
+import java.util.List;
 
 @Data
 public class CreateRequest {
     @NotBlank
     private String title;
-
     private String description;
     private IncidentPriority priority;
-    private Long assigneeId;
-
+    private IncidentCategory category;
+    private List<Long> assigneeIds;
+    private Instant dueAt;
 }

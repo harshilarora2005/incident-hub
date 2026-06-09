@@ -1,12 +1,13 @@
 package com.example.backend.dtos;
 
+import com.example.backend.entity.IncidentCategory;
 import com.example.backend.entity.IncidentPriority;
 import com.example.backend.entity.IncidentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,9 +18,12 @@ public class IncidentDetails {
     private String description;
     private IncidentStatus status;
     private IncidentPriority priority;
+    private IncidentCategory category;
+    private Integer progress;
     private UserDTO reporter;
-    private UserDTO assignee;
+    private List<UserDTO> assignees;
+    private Instant dueAt;
+    private Instant resolvedAt;
     private Instant createdAt;
     private Instant updatedAt;
-
 }
