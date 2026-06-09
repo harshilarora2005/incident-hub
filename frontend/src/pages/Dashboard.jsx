@@ -1,12 +1,7 @@
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import useAuth from "../hooks/useAuth";
-import {
-    SidebarProvider,
-    SidebarTrigger,
-} from "@/components/ui/sidebar";
 
-import { AppSidebar } from "@/components/AppSidebar";
 export default function Dashboard() {
     const {
         user,
@@ -28,15 +23,15 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#21313F] text-white">
+            <div className="flex items-center justify-center h-full min-h-screen">
                 Loading...
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#21313F] p-6">
-            <div className="max-w-4xl mx-auto">
+        <div className="p-6">
+            <div className="max-w-5xl mx-auto">
                 <div className="bg-[#F7F8F6] rounded-3xl shadow-xl p-8">
                     <h1 className="text-3xl font-bold text-gray-800">
                         Dashboard
@@ -46,33 +41,33 @@ export default function Dashboard() {
                         Welcome back, {user?.name}
                     </p>
 
-                    <div className="mt-8 grid gap-4">
-                        <div className="p-4 rounded-2xl border border-gray-200">
+                    <div className="mt-8 grid gap-4 md:grid-cols-3">
+                        <div className="p-5 rounded-2xl border bg-white">
                             <p className="text-sm text-gray-500">
                                 Name
                             </p>
 
-                            <p className="font-semibold text-gray-800">
+                            <p className="font-semibold text-gray-800 mt-1">
                                 {user?.name}
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-2xl border border-gray-200">
+                        <div className="p-5 rounded-2xl border bg-white">
                             <p className="text-sm text-gray-500">
                                 Email
                             </p>
 
-                            <p className="font-semibold text-gray-800">
+                            <p className="font-semibold text-gray-800 mt-1">
                                 {user?.email}
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-2xl border border-gray-200">
+                        <div className="p-5 rounded-2xl border bg-white">
                             <p className="text-sm text-gray-500">
                                 Role(s)
                             </p>
 
-                            <p className="font-semibold text-gray-800">
+                            <p className="font-semibold text-gray-800 mt-1">
                                 {user?.roles?.join(", ")}
                             </p>
                         </div>
@@ -87,7 +82,8 @@ export default function Dashboard() {
 
                         <button
                             onClick={handleLogout}
-                            className="px-5 py-3 rounded-2xl border border-red-300 text-red-600 font-medium hover:bg-red-50 transition">
+                            className="px-5 py-3 rounded-2xl border border-red-300 text-red-600 font-medium hover:bg-red-50 transition"
+                        >
                             Logout
                         </button>
                     </div>

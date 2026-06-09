@@ -1,18 +1,31 @@
-import { Home, AlertTriangle, Users, Settings } from "lucide-react";
+import { NavLink } from "react-router";
+import {
+    Home,
+    AlertTriangle,
+    Users,
+    Shield,
+    FileText,
+} from "lucide-react";
+
 import {
     Sidebar,
     SidebarContent,
+    SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const items = [
+import useAuth from "../hooks/useAuth";
+
+const mainItems = [
     {
         title: "Dashboard",
-        url: "/dashboard",
+        url: "/",
         icon: Home,
     },
     {
@@ -21,31 +34,92 @@ const items = [
         icon: AlertTriangle,
     },
     {
+        title: "Reports",
+        url: "/reports",
+        icon: FileText,
+    },
+];
+
+const managementItems = [
+    {
         title: "Users",
         url: "/users",
         icon: Users,
     },
     {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
+        title: "Roles",
+        url: "/roles",
+        icon: Shield,
     },
 ];
 
 export function AppSidebar() {
+    const { user } = useAuth();
+
     return (
         <Sidebar>
+            <SidebarHeader>
+                <div className="flex flex-col px-2 py-3">
+                    <h2 className="text-lg font-bold">
+                        IncidentHub
+                    </h2>
+
+                    <p className="text-xs text-muted-foreground">
+                        Administration
+                    </p>
+                </div>
+            </SidebarHeader>
+
             <SidebarContent>
                 <SidebarGroup>
+                    <SidebarGroupLabel>
+                        Main
+                    </SidebarGroupLabel>
+
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {mainItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url}>
+                                        <NavLink
+                                            to={item.url}
+                                            className={({ isActive }) =>
+                                                isActive
+                                                    ? "font-medium"
+                                                    : ""
+                                            }
+                                        >
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </a>
+                                        </NavLink>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+
+                <SidebarGroup>
+                    <SidebarGroupLabel>
+                        Management
+                    </SidebarGroupLabel>
+
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {managementItems.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton asChild>
+                                        <NavLink
+                                            to={item.url}
+                                            className={({ isActive }) =>
+                                                isActive
+                                                    ? "font-medium"
+                                                    : ""
+                                            }
+                                        >
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </NavLink>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -53,6 +127,18 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+
+            <SidebarFooter>
+                <div className="rounded-lg border p-3">
+                    <p className="font-medium">
+                        {user?.name}
+                    </p>
+
+                    <p className="text-xs text-muted-foreground truncate">
+                        {user?.email}
+                    </p>
+                </div>
+            </SidebarFooter>
         </Sidebar>
     );
 }
