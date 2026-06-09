@@ -22,6 +22,7 @@ const CATEGORY_STYLES = {
     APP: "bg-[#E6F1FB] text-[#0C447C]",
 };
 
+
 const MOCK_INCIDENTS = [
     {
         id: 1,
