@@ -30,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder enc;
     private final JwtUtil jwt;
     private final AuthenticationManager am;
+    private final EmailService es;
 
     public AuthResponse register(RegisterRequest r, HttpServletResponse response) {
         if (userRepo.existsByEmail(r.getEmail())) {
@@ -42,6 +43,11 @@ public class AuthService {
                 .roles(new java.util.HashSet<>(Set.of(Role.ENGINEER)))
                 .build();
         userRepo.save(user);
+        try {
+            es.sendWelcomeEmail(user.getEmail(), user.getName());
+        } catch (Exception e) {
+            System.err.println("Welcome email failed: " + e.getMessage());
+        }
         return createAuthResponse(user, response);
     }
     public AuthResponse login(LoginRequest r, HttpServletResponse response) {

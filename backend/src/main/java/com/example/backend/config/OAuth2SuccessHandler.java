@@ -3,6 +3,7 @@ package com.example.backend.config;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.service.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRepository userRepo;
     private final JwtUtil jwt;
+    private final EmailService es;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -36,6 +38,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                             .name(name)
                             .roles(new HashSet<>(Set.of(Role.ENGINEER)))
                             .build();
+                    try {
+                        es.sendWelcomeEmail(email, name);
+                    } catch (Exception e) {
+                        System.err.println("Welcome email failed: " + e.getMessage());
+                    }
                     return userRepo.save(newUser);
                 });
         String token = jwt.generateToken(
