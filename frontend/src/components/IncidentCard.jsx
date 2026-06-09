@@ -3,11 +3,8 @@ import {
     CATEGORY_STYLES,
     PROGRESS_BAR_COLOR,
     SEVERITY_STYLES,
-} from "@/constants/incidentStyles";
-import {
-    CATEGORY_LABELS,
-} from "@/constants/incidentLabels";
-
+} from "../assets/constants/incidentStyles";
+import { CATEGORY_LABELS } from "../assets/constants/incidentLables";
 export function IncidentCard({ incident }) {
     const isResolved = incident.status === "RESOLVED";
     const createdDate = new Date(incident.createdAt);
