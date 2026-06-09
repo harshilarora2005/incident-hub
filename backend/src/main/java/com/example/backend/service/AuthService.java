@@ -79,8 +79,8 @@ public class AuthService {
         User user = userRepo.findByEmail(email).orElseThrow(() -> new CustomExceptionHandler("User not found"));
         return new AuthResponse(
                 user.getId(),
-                user.getEmail(),
                 user.getName(),
+                user.getEmail(),
                 user.getRoles()
         );
     }

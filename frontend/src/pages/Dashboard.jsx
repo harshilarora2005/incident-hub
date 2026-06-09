@@ -8,7 +8,7 @@ export default function Dashboard() {
         loading,
         logout,
     } = useAuth();
-
+    console.log(user)
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -52,12 +52,12 @@ export default function Dashboard() {
                             </p>
                         </div>
 
-                        <div className="p-5 rounded-2xl border bg-white">
+                        <div className="truncate p-5 rounded-2xl border bg-white">
                             <p className="text-sm text-gray-500">
                                 Email
                             </p>
 
-                            <p className="font-semibold text-gray-800 mt-1">
+                            <p className="truncate font-semibold text-gray-800 mt-1">
                                 {user?.email}
                             </p>
                         </div>

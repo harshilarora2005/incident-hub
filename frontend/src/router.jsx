@@ -5,7 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layout/DashboardLayout";
-
+import IncidentsPage from "./pages/Incidents";
 const router = createBrowserRouter([
     {
         element: <App />,
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: "/incidents",
-                                element: <h1>Incidents</h1>,
+                                element: <IncidentsPage/>,
                             },
                             {
                                 path: "/users",

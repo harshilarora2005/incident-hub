@@ -2,7 +2,7 @@ package com.example.backend.entity;
 
 public enum IncidentStatus {
     OPEN,
-    CLOSED,
+    REVIEW,
     IN_PROGRESS,
     ESCALATED,
     RESOLVED

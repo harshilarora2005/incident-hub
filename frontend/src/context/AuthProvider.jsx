@@ -11,6 +11,7 @@ export default function AuthProvider({ children }) {
     const loadUser = async () => {
         try {
             const userData = await getCurrentUser();
+            console.log(userData)
             setUser(userData);
         } catch {
             setUser(null);
