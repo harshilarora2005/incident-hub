@@ -1,7 +1,12 @@
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import useAuth from "../hooks/useAuth";
+import {
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/components/ui/sidebar";
 
+import { AppSidebar } from "@/components/AppSidebar";
 export default function Dashboard() {
     const {
         user,
