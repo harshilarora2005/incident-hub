@@ -1,53 +1,26 @@
 import { Clock, CheckCircle2 } from "lucide-react";
-
-const SEVERITY_STYLES = {
-    CRITICAL: "bg-[#FAECE7] text-[#712B13]",
-    HIGH: "bg-[#FAEEDA] text-[#633806]",
-    MEDIUM: "bg-[#E6F1FB] text-[#0C447C]",
-    LOW: "bg-[#EAF3DE] text-[#27500A]",
-};
-
-const PROGRESS_BAR_COLOR = {
-    IN_PROGRESS: "bg-[#C4714A]",
-    UNDER_REVIEW: "bg-[#E2A84B]",
-    RESOLVED: "bg-[#4CAF82]",
-};
-
-const CATEGORY_STYLES = {
-    INFRA: "bg-[#E0F2FE] text-[#075985]",
-    SECURITY: "bg-[#FEE2E2] text-[#991B1B]",
-    NETWORK: "bg-[#ECFDF5] text-[#065F46]",
-    APP: "bg-[#F3E8FF] text-[#6B21A8]",
-    DATABASE: "bg-[#FEF3C7] text-[#92400E]",
-    GENERAL: "bg-[#F3F4F6] text-[#4B5563]",
-};
-
-const CATEGORY_LABELS = {
-    INFRA: "Infrastructure",
-    SECURITY: "Security",
-    NETWORK: "Network",
-    APP: "Application",
-    DATABASE: "Database",
-    GENERAL: "General",
-};
+import {
+    CATEGORY_STYLES,
+    PROGRESS_BAR_COLOR,
+    SEVERITY_STYLES,
+} from "@/constants/incidentStyles";
+import {
+    CATEGORY_LABELS,
+} from "@/constants/incidentLabels";
 
 export function IncidentCard({ incident }) {
     const isResolved = incident.status === "RESOLVED";
-
     const createdDate = new Date(incident.createdAt);
-
     const formattedDate = new Intl.DateTimeFormat("en-IN", {
         day: "numeric",
         month: "short",
         year: "numeric",
     }).format(createdDate);
-
     const formattedTime = new Intl.DateTimeFormat("en-IN", {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
     }).format(createdDate);
-
     return (
         <div className="bg-[#FAFAF7] rounded-xl border border-[rgba(138,155,170,0.15)] p-3 mb-2 cursor-pointer hover:border-[rgba(196,113,74,0.3)] transition-colors">
             <div className="flex flex-wrap gap-1.5 mb-2">
