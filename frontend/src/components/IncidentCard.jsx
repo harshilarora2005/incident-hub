@@ -7,13 +7,6 @@ const SEVERITY_STYLES = {
     LOW: "bg-[#EAF3DE] text-[#27500A]",
 };
 
-const CATEGORY_STYLES = {
-    INFRA: "bg-[#EEEDFE] text-[#3C3489]",
-    SECURITY: "bg-[#FAECE7] text-[#712B13]",
-    NETWORK: "bg-[#E1F5EE] text-[#085041]",
-    APP: "bg-[#E6F1FB] text-[#0C447C]",
-};
-
 const PROGRESS_BAR_COLOR = {
     IN_PROGRESS: "bg-[#C4714A]",
     UNDER_REVIEW: "bg-[#E2A84B]",
@@ -22,14 +15,12 @@ const PROGRESS_BAR_COLOR = {
 
 export function IncidentCard({ incident }) {
     const isResolved = incident.status === "RESOLVED";
+    console.log(incident)
     return (
         <div className="bg-[#FAFAF7] rounded-xl border border-[rgba(138,155,170,0.15)] p-3 mb-2 cursor-pointer hover:border-[rgba(196,113,74,0.3)] transition-colors">
             <div className="flex flex-wrap gap-1.5 mb-2">
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${SEVERITY_STYLES[incident.severity]}`}>
-                    {incident.severity.charAt(0) + incident.severity.slice(1).toLowerCase()}
-                </span>
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${CATEGORY_STYLES[incident.category]}`}>
-                    {incident.category.charAt(0) + incident.category.slice(1).toLowerCase()}
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${SEVERITY_STYLES[incident.priority]}`}>
+                    {incident.priority.charAt(0) + incident.priority.slice(1).toLowerCase()}
                 </span>
             </div>
 
