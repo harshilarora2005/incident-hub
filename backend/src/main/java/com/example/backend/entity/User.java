@@ -31,4 +31,7 @@ public class User {
     @Column(name="role")
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(mappedBy = "assignees", fetch = FetchType.LAZY)
+    private Set<Incident> assignedIncidents = new HashSet<>();
 }
