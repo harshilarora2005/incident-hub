@@ -12,8 +12,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 import AssigneeSelect from "../components/AssigneeFleet";
-
+import { createIncident } from "../api/incidents";
 export default function ReportIncident() {
     const {
         register,
@@ -36,6 +37,15 @@ export default function ReportIncident() {
             dueAt: data.dueAt ? new Date(data.dueAt).toISOString() : null,
         };
         console.log(payload);
+        try{
+            const response = await createIncident(payload);
+            toast.success("Created Ticket!");
+            console.log(response);
+        }catch(error){
+            toast.error(
+                error.response?.data?.message || "Failed to create Incident"
+            );
+        }
     };
 
     return (
