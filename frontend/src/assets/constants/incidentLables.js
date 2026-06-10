@@ -6,3 +6,9 @@ export const CATEGORY_LABELS = {
     DATABASE: "Database",
     GENERAL: "General",
 };
+export const PRIORITY_LABELS = [
+    "CRITICAL",
+    "HIGH",
+    "MEDIUM",
+    "LOW",
+];

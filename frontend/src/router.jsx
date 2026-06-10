@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layout/DashboardLayout";
 import IncidentsPage from "./pages/Incidents";
+import ReportIncident from "./pages/ReportIncident";
 const router = createBrowserRouter([
     {
         element: <App />,
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
                                 path: "/settings",
                                 element: <h1>Settings</h1>,
                             },
+                            {
+                                path: "/create-incident",
+                                element: <ReportIncident/>
+                            }
                         ],
                     },
                 ],

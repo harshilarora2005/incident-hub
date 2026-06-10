@@ -1,5 +1,5 @@
 import useAuth from "../hooks/useAuth";
-
+import { useNavigate } from "react-router";
 export default function Dashboard() {
     const {
         user,
@@ -13,7 +13,7 @@ export default function Dashboard() {
             </div>
         );
     }
-
+    const navigate = useNavigate();
     return (
         <div className="p-6">
             <div className="max-w-5xl mx-auto">
@@ -61,6 +61,7 @@ export default function Dashboard() {
                     <div className="mt-8 flex gap-3">
                         <button
                             className="px-5 py-3 rounded-2xl bg-[#877D7A] text-white font-medium hover:opacity-90 transition"
+                            onClick={()=>navigate("/create-incident")}
                         >
                             Create Incident
                         </button>
