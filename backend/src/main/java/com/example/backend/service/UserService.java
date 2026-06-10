@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.cloudinary.Cloudinary;
+import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
@@ -37,10 +38,12 @@ public class UserService {
                 .toList();
     }
     @Transactional
-    public UserDTO uploadAvatar(MultipartFile file, User currentUser) {
-        String avatarUrl = service.uploadAvatar(file);
-        currentUser.setAvatarUrl(avatarUrl);
-        userRepo.save(currentUser);
-        return mapper.toDto(currentUser);
+    public UserDTO uploadAvatar(MultipartFile file, AuthResponse currentUser) {
+        String avatarUrl = service.uploadAvatar(file,currentUser.getUserId());
+        User user = userRepo.findById(currentUser.getUserId())
+                        .orElseThrow(() ->new CustomExceptionHandler("User not found"));
+        user.setAvatarUrl(avatarUrl);
+        userRepo.save(user);
+        return mapper.toDto(user);
     }
 }

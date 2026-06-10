@@ -12,11 +12,15 @@ import java.util.Map;
 @Service
 public class CloudinaryService {
     private final Cloudinary cloudinary;
-    public String uploadAvatar(MultipartFile file) {
+    public String uploadAvatar(MultipartFile file, Long Id) {
         try{
-            Map<?,?> result = cloudinary.uploader().upload(
-                    file.getBytes(), ObjectUtils.asMap(
-                            "folder", "incident-management/avatars"
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "incident-management/avatars",
+                            "public_id", "user_" + Id.toString(),
+                            "overwrite", true,
+                            "invalidate", true
                     )
             );
             return result.get("secure_url").toString();
