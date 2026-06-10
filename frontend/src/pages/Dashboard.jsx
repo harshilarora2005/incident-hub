@@ -1,24 +1,10 @@
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
 import useAuth from "../hooks/useAuth";
 
 export default function Dashboard() {
     const {
         user,
-        loading,
-        logout,
+        loading
     } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            toast.success("Logged out successfully");
-            navigate("/login");
-        } catch {
-            toast.error("Failed to logout");
-        }
-    };
 
     if (loading) {
         return (
@@ -77,13 +63,6 @@ export default function Dashboard() {
                             className="px-5 py-3 rounded-2xl bg-[#877D7A] text-white font-medium hover:opacity-90 transition"
                         >
                             Create Incident
-                        </button>
-
-                        <button
-                            onClick={handleLogout}
-                            className="px-5 py-3 rounded-2xl border border-red-300 text-red-600 font-medium hover:bg-red-50 transition"
-                        >
-                            Logout
                         </button>
                     </div>
                 </div>

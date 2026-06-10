@@ -4,7 +4,6 @@ import {
     Users,
     Shield,
     FileText,
-    ChevronRight,
 } from "lucide-react";
 import NavUser from "./NavUser";
 import {
@@ -107,7 +106,6 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-
             <SidebarFooter>
                 <NavUser user={user} open={open}/>
             </SidebarFooter>
