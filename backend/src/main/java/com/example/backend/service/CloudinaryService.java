@@ -14,7 +14,7 @@ public class CloudinaryService {
     private final Cloudinary cloudinary;
     public String uploadAvatar(MultipartFile file, Long Id) {
         try{
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+            Map<?, ?> result = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(
                             "folder", "incident-management/avatars",

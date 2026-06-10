@@ -81,7 +81,8 @@ public class AuthService {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRoles()
+                user.getRoles(),
+                user.getAvatarUrl()
         );
     }
 
@@ -98,7 +99,7 @@ public class AuthService {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        return new AuthResponse(user.getId(), user.getEmail(), user.getName(), user.getRoles());
+        return new AuthResponse(user.getId(), user.getEmail(), user.getName(), user.getRoles(),user.getAvatarUrl());
     }
 
 }

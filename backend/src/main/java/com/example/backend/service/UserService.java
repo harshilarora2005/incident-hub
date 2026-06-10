@@ -44,6 +44,7 @@ public class UserService {
                         .orElseThrow(() ->new CustomExceptionHandler("User not found"));
         user.setAvatarUrl(avatarUrl);
         userRepo.save(user);
-        return mapper.toDto(user);
+        UserDTO response = mapper.toDto(user);
+        return response;
     }
 }

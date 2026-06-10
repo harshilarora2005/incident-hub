@@ -1,6 +1,5 @@
 package com.example.backend.mappers;
 
-
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.entity.User;
 import org.mapstruct.Mapper;
@@ -9,6 +8,7 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
 
     UserDTO toDto(User u);
+    
     User toEntity(UserDTO ud);
 }
 
