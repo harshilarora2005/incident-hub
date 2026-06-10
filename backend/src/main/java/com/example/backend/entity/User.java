@@ -23,7 +23,7 @@ public class User {
 
     @Column
     private String avatarUrl;
-    
+
     @Builder.Default
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
