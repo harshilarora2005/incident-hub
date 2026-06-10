@@ -1,10 +1,13 @@
 package com.example.backend.controller;
 
+import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
+import com.example.backend.service.AuthService;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
 public class IncidentController {
     private final IncidentService service;
     private final CurrentUser user;
+    private final AuthService authService;
 
     @GetMapping
     public List<IncidentDetails> list(){
@@ -28,6 +32,10 @@ public class IncidentController {
     public IncidentDetails findById(@PathVariable Long id){
         return service.findById(id);
     }
-
+    @GetMapping("/my")
+    public List<IncidentDetails> listMy(Authentication authentication){
+        AuthResponse au = authService.getCurrentUser(authentication);
+        return service.getIncidentsForUser(au.getUserId());
+    }
 
 }

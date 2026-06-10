@@ -11,9 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -73,8 +72,19 @@ public class IncidentService {
         ));
     }
 
-    public void delete(Long id) {
+    @Transactional(readOnly = true)
+    public List<IncidentDetails> getIncidentsForUser(Long userId) {
+       User us = users.findById(userId).orElseThrow(()->
+               new CustomExceptionHandler("User not found"));
+        Set<Incident> li = us.getAssignedIncidents()
+                .stream()
+                .sorted(
+                        Comparator.comparing(Incident::getCreatedAt)
+                                .reversed()
+                )
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
+       return li.stream().map(mapper::toDto).toList();
     }
 
 }
