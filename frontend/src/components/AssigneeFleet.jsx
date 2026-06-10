@@ -1,50 +1,68 @@
 import {
-    Avatar,
-    AvatarFallback,
-    AvatarGroup,
-    AvatarGroupCount,
-    AvatarImage,
-} from "@/components/ui/avatar";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+    Combobox,
+    ComboboxChip,
+    ComboboxChips,
+    ComboboxChipsInput,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxValue,
+    useComboboxAnchor,
+} from "@/components/ui/combobox";
 
-export default function AssigneeFleet({assignees = [],collapseNum,}) {
-    const visibleAssignees = collapseNum ? assignees.slice(0, collapseNum): assignees;
+const users = [
+    "Next.js",
+    "SvelteKit",
+    "Nuxt.js",
+    "Remix",
+    "Astro",
+];
 
-    const hiddenCount = collapseNum ? Math.max(0, assignees.length - collapseNum): 0;
+export default function AssigneeSelect() {
+    const anchor = useComboboxAnchor();
     return (
-        <AvatarGroup>
-            {visibleAssignees.map((assignee) => (
-                <Tooltip key={assignee.id}>
-                    <TooltipTrigger>
-                        <Avatar>
-                            <AvatarImage
-                                src={assignee.avatarUrl}
-                                alt={assignee.name}
-                            />
-                            <AvatarFallback className="bg-[#C4714A] text-[#FAFAF7] text-xs font-medium">
-                                {(assignee?.name ?? "?")
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")
-                                    .slice(0, 2)
-                                    .toUpperCase()}
-                            </AvatarFallback>
-                        </Avatar>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>{assignee.name}</p>
-                    </TooltipContent>
-                </Tooltip>
-            ))}
-            {hiddenCount > 0 && (
-                <AvatarGroupCount>
-                    +{hiddenCount}
-                </AvatarGroupCount>
-            )}
-        </AvatarGroup>
+        <Combobox
+            multiple
+            autoHighlight
+            items={users}
+            defaultValue={[users[0]]}
+        >
+            <ComboboxChips
+                ref={anchor}
+                className="w-full"
+            >
+                <ComboboxValue>
+                    {(values) => (
+                        <>
+                            {values.map((value) => (
+                                <ComboboxChip key={value}>
+                                    {value}
+                                </ComboboxChip>
+                            ))}
+
+                            <ComboboxChipsInput />
+                        </>
+                    )}
+                </ComboboxValue>
+            </ComboboxChips>
+
+            <ComboboxContent anchor={anchor}>
+                <ComboboxEmpty>
+                    No items found.
+                </ComboboxEmpty>
+
+                <ComboboxList>
+                    {(item) => (
+                        <ComboboxItem
+                            key={item}
+                            value={item}
+                        >
+                            {item}
+                        </ComboboxItem>
+                    )}
+                </ComboboxList>
+            </ComboboxContent>
+        </Combobox>
     );
 }
