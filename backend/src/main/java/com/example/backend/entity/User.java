@@ -21,6 +21,9 @@ public class User {
     @Column(nullable=false)
     private String name;
 
+    @Column
+    private String avatarUrl;
+    
     @Builder.Default
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
@@ -34,4 +37,5 @@ public class User {
 
     @ManyToMany(mappedBy = "assignees", fetch = FetchType.LAZY)
     private Set<Incident> assignedIncidents = new HashSet<>();
+
 }
