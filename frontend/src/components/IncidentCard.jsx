@@ -4,6 +4,7 @@ import {
     PROGRESS_BAR_COLOR,
     SEVERITY_STYLES,
 } from "../assets/constants/incidentStyles";
+import AssigneeFleet from "./AssigneeFleet";
 import { CATEGORY_LABELS } from "../assets/constants/incidentLables";
 export function IncidentCard({ incident }) {
     const isResolved = incident.status === "RESOLVED";
@@ -89,12 +90,7 @@ export function IncidentCard({ incident }) {
 
             <div className="flex items-center justify-between">
                 <div>
-                    {incident.assignees?.length > 0 && (
-                        <span className="text-[11px] text-[#8A9BAA]">
-                            {incident.assignees.length} assignee
-                            {incident.assignees.length > 1 ? "s" : ""}
-                        </span>
-                    )}
+                    <AssigneeFleet assignees={incident.assignees}/>
                 </div>
 
                 <div className="flex items-center gap-2">
