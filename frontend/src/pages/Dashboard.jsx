@@ -8,7 +8,6 @@ export default function Dashboard() {
         loading,
         logout,
     } = useAuth();
-    console.log(user)
     const navigate = useNavigate();
 
     const handleLogout = async () => {
