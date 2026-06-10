@@ -90,7 +90,7 @@ export function IncidentCard({ incident }) {
 
             <div className="flex items-center justify-between">
                 <div>
-                    <AssigneeFleet assignees={incident.assignees}/>
+                    <AssigneeFleet assignees={incident.assignees} collapseNum={3}/>
                 </div>
 
                 <div className="flex items-center gap-2">

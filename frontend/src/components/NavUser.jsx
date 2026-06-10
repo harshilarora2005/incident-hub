@@ -25,7 +25,7 @@ export default function NavUser({ user, open }) {
     };
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
                 <div className="mx-1 mb-2 cursor-pointer">
                     {open ? (
                         <div className="flex items-center gap-3 rounded-xl bg-[#FAFAF7] px-3 py-2.5 hover:bg-[#ede8e0] transition-colors">
