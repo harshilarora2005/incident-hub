@@ -41,8 +41,8 @@ export function AppSidebar() {
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <div className={`flex items-center px-2 py-3 ${open ? "gap-2.5" : "justify-center"}`}>
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#C4714A] text-[#FAFAF7]">
-                        <AlertTriangle size={16} />
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lgtext-[#FAFAF7]">
+                        <img src="/shark.png"/>                        
                     </div>
                     {open && (
                         <div className="flex flex-col">
