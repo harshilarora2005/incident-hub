@@ -112,8 +112,16 @@ export function AppSidebar() {
                 <div className="mx-1 mb-2">
                     {open ? (
                         <div className="flex items-center gap-3 rounded-xl bg-[#FAFAF7] px-3 py-2.5 cursor-pointer hover:bg-[#ede8e0] transition-colors">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C4714A] text-xs font-medium text-[#FAFAF7]">
-                                {user?.name?.slice(0, 2).toUpperCase()}
+                            <div className="flex h-9 w-9 shrink-0 overflow-hidden items-center justify-center rounded-full bg-[#C4714A]">
+                                {user?.avatarUrl ? (
+                                    <img
+                                        src={user.avatarUrl}
+                                        alt={user.name}
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    user?.name?.slice(0, 2).toUpperCase()
+                                )}
                             </div>
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-medium text-[#111D28] leading-tight">
@@ -126,11 +134,17 @@ export function AppSidebar() {
                             <ChevronRight size={15} className="shrink-0 text-[#8A9BAA]" />
                         </div>
                     ) : (
-                        <div className="flex justify-center py-1 w-full">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#C4714A] text-xs font-medium text-[#FAFAF7] cursor-pointer">
-                                {user?.name?.slice(0, 2).toUpperCase()}
-                            </div>
-                        </div>
+                        <div className="flex h-8 w-8 overflow-hidden items-center justify-center rounded-full bg-[#C4714A] text-xs font-medium text-[#FAFAF7] cursor-pointer">
+                        {user?.avatarUrl ? (
+                            <img
+                                src={user.avatarUrl}
+                                alt={user.name}
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
+                            user?.name?.slice(0, 2).toUpperCase()
+                        )}
+                    </div>
                     )}
                 </div>
             </SidebarFooter>
