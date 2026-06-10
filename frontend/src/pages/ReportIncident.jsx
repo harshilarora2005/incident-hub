@@ -27,9 +27,9 @@ export default function ReportIncident() {
             priority: "MEDIUM",
             category: "GENERAL",
             dueAt: "",
+            assigneeIds: [],
         },
     });
-
     const onSubmit = async (data) => {
         const payload = {
             ...data,
@@ -161,7 +161,24 @@ export default function ReportIncident() {
                     >
                         Assign Members
                     </Label>
-                    <AssigneeSelect/>
+                    <Controller
+                        control={control}
+                        name="assigneeIds"
+                        render={({ field }) => (
+                            <AssigneeSelect
+                                value={field.value}
+                                onChange={field.onChange}
+                            />
+                        )}
+                    />
+                    {errors.assigneeIds && (
+                        <p
+                            className="text-xs mt-1"
+                            style={{ color: "#C4714A" }}
+                        >
+                            {errors.assigneeIds.message}
+                        </p>
+                    )}
                 </Field>
                 <Button
                     type="submit"
@@ -171,7 +188,6 @@ export default function ReportIncident() {
                 >
                     {isSubmitting ? "Creating..." : "Create incident"}
                 </Button>
-                
             </form>
         </div>
     );

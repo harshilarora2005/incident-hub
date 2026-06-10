@@ -11,22 +11,55 @@ import {
     useComboboxAnchor,
 } from "@/components/ui/combobox";
 
-const users = [
-    "Next.js",
-    "SvelteKit",
-    "Nuxt.js",
-    "Remix",
-    "Astro",
-];
+import { useState, useEffect, useMemo } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAllUsers } from "../api/userApi";
 
-export default function AssigneeSelect() {
+export default function AssigneeSelect({value = [],onChange,}) {
     const anchor = useComboboxAnchor();
+    const [users, setUsers] = useState([]);
+    const [error, setError] = useState(null);
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const result = await getAllUsers();
+                setUsers(result);
+            } catch (err) {
+                console.error(err);
+                setError("Failed to load users.");
+            }
+        };
+
+        fetchUsers();
+    }, []);
+    const userMap = useMemo(
+        () =>
+            Object.fromEntries(
+                users.map((user) => [String(user.id), user])
+            ),
+        [users]
+    );
+
+    if (error) {
+        return (
+            <p className="text-sm text-red-500">
+                {error}
+            </p>
+        );
+    }
+
     return (
         <Combobox
             multiple
             autoHighlight
-            items={users}
-            defaultValue={[users[0]]}
+            items={users.map((user) => ({
+                label: user.name,
+                value: String(user.id),
+            }))}
+            value={value.map(String)}
+            onValueChange={(values) =>
+                onChange(values.map(Number))
+            }
         >
             <ComboboxChips
                 ref={anchor}
@@ -35,32 +68,88 @@ export default function AssigneeSelect() {
                 <ComboboxValue>
                     {(values) => (
                         <>
-                            {values.map((value) => (
-                                <ComboboxChip key={value}>
-                                    {value}
-                                </ComboboxChip>
-                            ))}
+                            {values.map((id) => {
+                                const user = userMap[id];
+
+                                if (!user) return null;
+
+                                return (
+                                    <ComboboxChip key={user.id}>
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="h-5 w-5">
+                                                <AvatarImage
+                                                    src={user.avatarUrl}
+                                                />
+
+                                                <AvatarFallback className="text-[10px]">
+                                                    {user.name
+                                                        .split(" ")
+                                                        .map(
+                                                            (n) => n[0]
+                                                        )
+                                                        .join("")
+                                                        .slice(0, 2)
+                                                        .toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+
+                                            {user.name}
+                                        </div>
+                                    </ComboboxChip>
+                                );
+                            })}
 
                             <ComboboxChipsInput />
                         </>
                     )}
                 </ComboboxValue>
             </ComboboxChips>
-
             <ComboboxContent anchor={anchor}>
                 <ComboboxEmpty>
-                    No items found.
+                    No users found.
                 </ComboboxEmpty>
 
                 <ComboboxList>
-                    {(item) => (
-                        <ComboboxItem
-                            key={item}
-                            value={item}
-                        >
-                            {item}
-                        </ComboboxItem>
-                    )}
+                    {(item) => {
+                        const user =
+                            userMap[item.value];
+
+                        return (
+                            <ComboboxItem
+                                key={item.value}
+                                value={item.value}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-7 w-7">
+                                        <AvatarImage
+                                            src={user?.avatarUrl}
+                                        />
+
+                                        <AvatarFallback>
+                                            {user?.name
+                                                ?.split(" ")
+                                                .map(
+                                                    (n) => n[0]
+                                                )
+                                                .join("")
+                                                .slice(0, 2)
+                                                .toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+
+                                    <div>
+                                        <p className="text-sm">
+                                            {user?.name}
+                                        </p>
+
+                                        <p className="text-xs text-muted-foreground">
+                                            {user?.email}
+                                        </p>
+                                    </div>
+                                </div>
+                            </ComboboxItem>
+                        );
+                    }}
                 </ComboboxList>
             </ComboboxContent>
         </Combobox>

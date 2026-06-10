@@ -1,6 +1,7 @@
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router";
 export default function Dashboard() {
+    const navigate = useNavigate();
     const {
         user,
         loading
@@ -13,7 +14,6 @@ export default function Dashboard() {
             </div>
         );
     }
-    const navigate = useNavigate();
     return (
         <div className="p-6">
             <div className="max-w-5xl mx-auto">
