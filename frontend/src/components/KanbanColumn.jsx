@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Plus, MoreHorizontal } from "lucide-react";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { IncidentCard } from "./IncidentCard";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
 
-export function KanbanColumn({ column, incidents }) {
+export function KanbanColumn({ column, incidents, onQuickCreated }) {
     const [isCreating, setIsCreating] = useState(false);
+    const isResolved = column.key === "RESOLVED";
 
     const handleSave = async (form) => {
         const payload = {
@@ -16,7 +18,8 @@ export function KanbanColumn({ column, incidents }) {
             assigneeIds: form.assigneeIds,
         };
         try {
-            await createQuick(payload);
+            const created = await createQuick(payload);
+            onQuickCreated(created);
             toast.success("Incident created");
         } catch (error) {
             toast.error(error.response?.data?.message ?? "Failed to create incident");
@@ -24,8 +27,6 @@ export function KanbanColumn({ column, incidents }) {
             setIsCreating(false);
         }
     };
-
-    const isResolved = column.key === "RESOLVED";
 
     return (
         <div className="flex flex-col min-w-0">
@@ -44,13 +45,49 @@ export function KanbanColumn({ column, incidents }) {
                 </div>
                 <MoreHorizontal size={16} className="text-[#8A9BAA] cursor-pointer" />
             </div>
-
-            <div className="space-y-2">
-                {incidents.map((incident) => (
-                    <IncidentCard key={incident.id} incident={incident} />
-                ))}
-            </div>
-
+            <Droppable droppableId={column.key}>
+                {(provided, snapshot) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="space-y-2 transition-colors rounded-xl"
+                        style={{
+                            minHeight: 40,
+                            background: snapshot.isDraggingOver
+                                ? "rgba(196,113,74,0.06)"
+                                : "transparent",
+                            padding: snapshot.isDraggingOver ? "6px" : "0",
+                        }}
+                    >
+                        {incidents.map((incident, index) => (
+                            <Draggable
+                                key={incident.id}
+                                draggableId={String(incident.id)}
+                                index={index}
+                            >
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        style={{
+                                            ...provided.draggableProps.style,
+                                            opacity: snapshot.isDragging ? 0.85 : 1,
+                                            borderRadius: 12,
+                                            boxShadow: snapshot.isDragging
+                                                ? "0 8px 24px rgba(17,29,40,0.15)"
+                                                : "none",
+                                        }}
+                                    >
+                                        <IncidentCard incident={incident} />
+                                    </div>
+                                )}
+                            </Draggable>
+                        ))}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
             {!isResolved && (
                 <div className="mt-2">
                     {isCreating ? (
