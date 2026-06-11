@@ -96,6 +96,7 @@ public class IncidentService {
                                 ? IncidentStatus.OPEN
                                 : r.getStatus()
                 )
+                .assignees()
                 .progress(0)
                 .reporter(reporter)
                 .assignees(new HashSet<>())

@@ -1,36 +1,27 @@
 import { useState } from "react";
-import {
-    Plus,
-    MoreHorizontal,
-    Calendar,
-    User,
-    CornerDownLeft,
-} from "lucide-react";
+import { Plus, MoreHorizontal } from "lucide-react";
 import { IncidentCard } from "./IncidentCard";
+import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
-import {toast} from "sonner"
+import { toast } from "sonner";
 export function KanbanColumn({ column, incidents }) {
     const [isCreating, setIsCreating] = useState(false);
-    const [title, setTitle] = useState("");
-
-    const handleCreate = async() => {
-        if (!title.trim()) return;
+    const handleSave = async (form) => {
         const payload = {
-            title:title,
-            status: column.key
+            title: form.title,
+            status: column.key,
+            dueAt: form.dueAt ? form.dueAt.toISOString().split("T")[0] : null,
+            assigneeIds: form.assigneeIds,
+        };
+
+        try {
+            await createQuick(payload);
+            toast.success("Incident created");
+        } catch (error) {
+            toast.error(error.response?.data?.message ?? "Failed to create incident");
+        } finally {
+            setIsCreating(false);
         }
-        console.log(payload)
-        try{
-            const response = await createQuick(payload)
-            toast.success("Created Ticket!");
-            console.log(response);
-        }catch(error){
-            toast.error(
-                error.response?.data?.message || "Failed to create Incident"
-            );
-        }
-        setTitle("");
-        setIsCreating(false);
     };
 
     return (
@@ -41,60 +32,26 @@ export function KanbanColumn({ column, incidents }) {
                         className="w-2 h-2 rounded-full shrink-0"
                         style={{ background: column.dot }}
                     />
-
                     <span className="text-[13px] font-medium text-[#111D28]">
                         {column.label}
                     </span>
-
                     <span className="text-[12px] text-[#8A9BAA] bg-[rgba(138,155,170,0.15)] px-2 py-0.5 rounded-full">
                         {incidents.length}
                     </span>
                 </div>
-
-                <MoreHorizontal
-                    size={16}
-                    className="text-[#8A9BAA] cursor-pointer"
-                />
+                <MoreHorizontal size={16} className="text-[#8A9BAA] cursor-pointer" />
             </div>
-
             <div className="space-y-2">
                 {incidents.map((incident) => (
-                    <IncidentCard
-                        key={incident.id}
-                        incident={incident}
-                    />
+                    <IncidentCard key={incident.id} incident={incident} />
                 ))}
             </div>
-
             <div className="mt-2">
                 {isCreating ? (
-                    <div className="rounded-xl border border-[#D7DEE3] bg-white shadow-sm overflow-hidden">
-                        <textarea
-                            autoFocus
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="What needs to be done?"
-                            className="w-full min-h-10 resize-none bg-transparent p-4 text-[14px] outline-none placeholder:text-[#8A9BAA]"
-                        />
-
-                        <div className="flex items-center justify-between border-t border-[#EEF2F4] px-3 py-2">
-                            <div className="flex items-center gap-3 text-[#8A9BAA]">
-                                <button className="hover:text-[#111D28]">
-                                    <Calendar size={18} />
-                                </button>
-                                <button className="hover:text-[#111D28]">
-                                    <User size={18} />
-                                </button>
-                            </div>
-
-                            <button
-                                onClick={handleCreate}
-                                className="h-9 w-9 flex items-center justify-center rounded-lg bg-[#F3F4F6] text-[#8A9BAA] hover:bg-[#E5E7EB]"
-                            >
-                                <CornerDownLeft size={18} />
-                            </button>
-                        </div>
-                    </div>
+                    <QuickCreateCard
+                        onSave={handleSave}
+                        onCancel={() => setIsCreating(false)}
+                    />
                 ) : (
                     <button
                         onClick={() => setIsCreating(true)}
