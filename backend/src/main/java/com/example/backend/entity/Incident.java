@@ -2,6 +2,8 @@ package com.example.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.Instant;
 import java.util.*;
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 @Table(name = "incidents")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
+@SQLRestriction("is_deleted = false")
 public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
