@@ -169,9 +169,6 @@ export default function AccountPage() {
                         className="border-transparent opacity-60 cursor-not-allowed"
                         style={inputStyle}
                     />
-                    <p className="text-[11px]" style={{ color: colors.muted }}>
-                        Email cannot be changed here. Contact an admin.
-                    </p>
                 </FormField>
 
                 <hr style={{ borderColor: "rgba(138,155,170,0.15)" }} />
@@ -182,9 +179,6 @@ export default function AccountPage() {
                         <RoleBadge key={role} role={role} />
                     ))}
                 </div>
-                <p className="text-[11px]" style={{ color: colors.muted }}>
-                    Roles are managed by your administrator.
-                </p>
             </div>
         </div>
     );
