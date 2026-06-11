@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Plus} from "lucide-react";
 import { KanbanColumn } from "../components/KanbanColumn";
 import { useEffect } from "react";
-import { getMyIncidents } from "../api/incidents";
+import { getAllIncidents } from "../api/incidents";
 import { useNavigate } from "react-router";
 const COLUMNS = [
     { key: "OPEN", label: "Open", dot: "#8A9BAA" },
     { key: "IN_PROGRESS", label: "In Progress", dot: "#C4714A" },
-    { key: "UNDER_REVIEW", label: "Under Review", dot: "#E2A84B" },
+    { key: "REVIEW", label: "Under Review", dot: "#E2A84B" },
     { key: "RESOLVED", label: "Resolved", dot: "#4CAF82" },
 ];
 
@@ -19,7 +19,7 @@ export default function IncidentsPage() {
     useEffect(() => {
         const fetchIncidents = async () => {
             try {
-                const result = await getMyIncidents();
+                const result = await getAllIncidents();
                 console.log(result.data)
                 setIncidents(result.data);
             } catch (err) {

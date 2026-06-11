@@ -9,16 +9,28 @@ import {
     CornerDownLeft,
 } from "lucide-react";
 import { IncidentCard } from "./IncidentCard";
-
+import { createQuick } from "../api/incidents";
+import {toast} from "sonner"
 export function KanbanColumn({ column, incidents }) {
     const [isCreating, setIsCreating] = useState(false);
     const [title, setTitle] = useState("");
-    
-    const handleCreate = () => {
+
+    const handleCreate = async() => {
         if (!title.trim()) return;
-
-        // TODO: call create incident API
-
+        const payload = {
+            title:title,
+            status: column.key
+        }
+        console.log(payload)
+        try{
+            const response = await createQuick(payload)
+            toast.success("Created Ticket!");
+            console.log(response);
+        }catch(error){
+            toast.error(
+                error.response?.data?.message || "Failed to create Incident"
+            );
+        }
         setTitle("");
         setIsCreating(false);
     };
