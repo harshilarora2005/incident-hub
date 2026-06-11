@@ -27,7 +27,7 @@ public class UsersController {
         userService.updateRole(id, role);
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.findAll();

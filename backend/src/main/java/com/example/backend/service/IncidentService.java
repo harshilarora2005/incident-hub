@@ -39,7 +39,13 @@ public class IncidentService {
 
         return mapper.toDto(incidents.save(incident));
     }
-
+    public void updateStatus(Long incidentId, IncidentStatus newStatus) {
+        Incident incident = incidents.findById(incidentId).orElseThrow(()->
+                new CustomExceptionHandler("Incident not found")
+        );
+        incident.setStatus(newStatus);
+        incidents.save(incident);
+    }
     @Transactional
     public IncidentDetails createQuick(QuickCreateRequest r, User reporter) {
         Set<User> assignees = resolveAssignees(r.getAssigneeIds(), false);

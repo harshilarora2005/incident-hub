@@ -4,10 +4,12 @@ import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
 import com.example.backend.dtos.QuickCreateRequest;
+import com.example.backend.entity.IncidentStatus;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,11 @@ public class IncidentController {
     public List<IncidentDetails> listMy(Authentication authentication){
         AuthResponse au = authService.getCurrentUser(authentication);
         return service.getIncidentsForUser(au.getUserId());
+    }
+    @PatchMapping("/update/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long incidentId, @RequestBody IncidentStatus newStatus){
+        service.updateStatus(incidentId,newStatus);
+        return ResponseEntity.ok().build();
     }
 
 }
