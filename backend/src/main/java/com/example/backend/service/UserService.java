@@ -9,6 +9,7 @@ import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.UserMapper;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +39,17 @@ public class UserService {
                 .toList();
     }
     @Transactional
-    public UserDTO uploadAvatar(MultipartFile file, AuthResponse currentUser) {
-        String avatarUrl = service.uploadAvatar(file,currentUser.getUserId());
-        User user = userRepo.findById(currentUser.getUserId())
+    public UserDTO updateDisplayName(String newName,Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() ->new CustomExceptionHandler("User not found"));
+        user.setName(newName);
+        userRepo.save(user);
+        return mapper.toDto(user);
+    }
+    @Transactional
+    public UserDTO uploadAvatar(MultipartFile file, Long userId) {
+        String avatarUrl = service.uploadAvatar(file,userId);
+        User user = userRepo.findById(userId)
                         .orElseThrow(() ->new CustomExceptionHandler("User not found"));
         user.setAvatarUrl(avatarUrl);
         userRepo.save(user);

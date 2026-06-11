@@ -32,9 +32,14 @@ public class UsersController {
     public List<UserDTO> getAllUsers() {
         return userService.findAll();
     }
+    @PatchMapping("/me/name")
+    public ResponseEntity<UserDTO> updateUserName(@PathVariable String name, Authentication authentication) {
+        AuthResponse au = authService.getCurrentUser(authentication);
+        return ResponseEntity.ok(userService.updateDisplayName(name, au.getUserId()));
+    }
     @PatchMapping("/me/avatar")
     public ResponseEntity<UserDTO> uploadAvatar(@RequestParam("file") MultipartFile file, Authentication authentication) {
         AuthResponse au = authService.getCurrentUser(authentication);
-        return ResponseEntity.ok(userService.uploadAvatar(file, au));
+        return ResponseEntity.ok(userService.uploadAvatar(file, au.getUserId()));
     }
 }
