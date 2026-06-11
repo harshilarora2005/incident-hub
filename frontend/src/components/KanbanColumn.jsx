@@ -13,7 +13,7 @@ import { IncidentCard } from "./IncidentCard";
 export function KanbanColumn({ column, incidents }) {
     const [isCreating, setIsCreating] = useState(false);
     const [title, setTitle] = useState("");
-
+    
     const handleCreate = () => {
         if (!title.trim()) return;
 

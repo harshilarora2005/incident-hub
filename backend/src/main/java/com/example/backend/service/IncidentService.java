@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
+import com.example.backend.dtos.QuickCreateRequest;
 import com.example.backend.entity.*;
 import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.IncidentMapper;
@@ -85,6 +86,22 @@ public class IncidentService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
        return li.stream().map(mapper::toDto).toList();
+    }
+    @Transactional
+    public IncidentDetails createQuick(QuickCreateRequest r, User reporter) {
+        Incident incident = Incident.builder()
+                .title(r.getTitle())
+                .status(
+                        r.getStatus() == null
+                                ? IncidentStatus.OPEN
+                                : r.getStatus()
+                )
+                .progress(0)
+                .reporter(reporter)
+                .assignees(new HashSet<>())
+                .build();
+        Incident savedIncident = incidents.save(incident);
+        return mapper.toDto(savedIncident);
     }
 
 }

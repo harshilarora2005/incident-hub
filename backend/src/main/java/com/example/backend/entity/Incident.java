@@ -20,25 +20,27 @@ public class Incident {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private IncidentStatus status = IncidentStatus.OPEN;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private IncidentPriority priority = IncidentPriority.MEDIUM;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private IncidentCategory category = IncidentCategory.GENERAL;
 
-    @Column(nullable = false)
+    @Builder.Default
     private Integer progress = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "incident_assignees",

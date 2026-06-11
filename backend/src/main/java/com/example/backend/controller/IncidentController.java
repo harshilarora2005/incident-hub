@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
+import com.example.backend.dtos.QuickCreateRequest;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
@@ -27,6 +28,10 @@ public class IncidentController {
     @PostMapping
     public IncidentDetails create(@Valid @RequestBody CreateRequest req) {
         return service.create(req,user.get());
+    }
+    @PostMapping("/quick")
+    public IncidentDetails createQuick(@Valid @RequestBody QuickCreateRequest req) {
+        return service.createQuick(req,user.get());
     }
     @GetMapping("/{id}")
     public IncidentDetails findById(@PathVariable Long id){
