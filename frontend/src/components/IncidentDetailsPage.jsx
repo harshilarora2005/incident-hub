@@ -78,16 +78,6 @@ export default function IncidentDetailsPage({ incident }) {
                             )}
                         </div>
                     </div>
-
-                    <div className="rounded-2xl border p-6">
-                        <h2 className="font-semibold text-lg mb-4">
-                            Comments
-                        </h2>
-
-                        <p className="text-muted-foreground text-sm">
-                            Comments coming soon...
-                        </p>
-                    </div>
                 </div>
 
                 {/* Sidebar */}

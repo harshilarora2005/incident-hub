@@ -84,7 +84,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated }) {
                                         <Dialog
                                         open={open}
                                         onClose={() => setOpen(false)}
-                                        maxWidth="l"
+                                        maxWidth="md"
                                         fullWidth
                                     >
                                         <IncidentDetailsPage incident={incident} />
