@@ -39,10 +39,12 @@ public class IncidentService {
 
         return mapper.toDto(incidents.save(incident));
     }
+    @Transactional
     public void updateStatus(Long incidentId, IncidentStatus newStatus) {
         Incident incident = incidents.findById(incidentId).orElseThrow(()->
                 new CustomExceptionHandler("Incident not found")
         );
+        incident.setProgress(resolveProgress(newStatus));
         incident.setStatus(newStatus);
         incidents.save(incident);
     }

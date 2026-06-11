@@ -1,9 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.AuthResponse;
-import com.example.backend.dtos.CreateRequest;
-import com.example.backend.dtos.IncidentDetails;
-import com.example.backend.dtos.QuickCreateRequest;
+import com.example.backend.dtos.*;
 import com.example.backend.entity.IncidentStatus;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.IncidentService;
@@ -44,9 +41,9 @@ public class IncidentController {
         AuthResponse au = authService.getCurrentUser(authentication);
         return service.getIncidentsForUser(au.getUserId());
     }
-    @PatchMapping("/update/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long incidentId, @RequestBody IncidentStatus newStatus){
-        service.updateStatus(incidentId,newStatus);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest req){
+        service.updateStatus(id,req.getStatus());
         return ResponseEntity.ok().build();
     }
 

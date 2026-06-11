@@ -19,3 +19,8 @@ export const createQuick = async(payload) => {
     const response = await api.post("incidents/quick",payload)
     return response.data;
 }
+
+export const updateIncidentStatus = async (id, status) => {
+    const response = await api.patch(`/incidents/${id}/status`, { status });
+    return response.data;
+};

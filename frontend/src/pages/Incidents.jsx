@@ -4,7 +4,8 @@ import { DragDropContext } from "@hello-pangea/dnd";
 import { KanbanColumn } from "../components/KanbanColumn";
 import { getAllIncidents } from "../api/incidents";
 import { useNavigate } from "react-router";
-
+import { updateIncidentStatus } from "../api/incidents";
+import { toast } from "sonner";
 const COLUMNS = [
     { key: "OPEN",label: "Open",dot: "#8A9BAA" },
     { key: "IN_PROGRESS",label: "In Progress",dot: "#C4714A" },
@@ -26,8 +27,7 @@ export default function IncidentsPage() {
     }, []);
 
     const byStatus = (status) => incidents.filter((i) => i.status === status);
-    const handleQuickCreated = (incident) =>
-        setIncidents((prev) => [incident, ...prev]);
+    const handleQuickCreated = (incident) =>setIncidents((prev) => [incident, ...prev]);
 
     const onDragEnd = async ({ source, destination, draggableId }) => {
         if (!destination) return;
@@ -35,22 +35,21 @@ export default function IncidentsPage() {
             destination.droppableId === source.droppableId &&
             destination.index === source.index
         ) return;
-
         const newStatus = destination.droppableId;
         const id = Number(draggableId);
         setIncidents((prev) =>
             prev.map((inc) => inc.id === id ? { ...inc, status: newStatus } : inc)
         );
-
-        // try {
-        //     await updateIncidentStatus(id, newStatus);
-        // } catch {
-        //     const oldStatus = source.droppableId;
-        //     setIncidents((prev) =>
-        //         prev.map((inc) => inc.id === id ? { ...inc, status: oldStatus } : inc)
-        //     );
-        //     toast.error("Failed to update status");
-        // }
+        try {
+            console.log(id,newStatus)
+            await updateIncidentStatus(id, newStatus);
+        } catch {
+            const oldStatus = source.droppableId;
+            setIncidents((prev) =>
+                prev.map((inc) => inc.id === id ? { ...inc, status: oldStatus } : inc)
+            );
+            toast.error("Failed to update status");
+        }
     };
 
     if (loading) return (
