@@ -2,8 +2,6 @@ import { useState } from "react";
 import {
     Plus,
     MoreHorizontal,
-    CheckSquare,
-    ChevronDown,
     Calendar,
     User,
     CornerDownLeft,

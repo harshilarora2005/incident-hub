@@ -2,222 +2,104 @@ import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Field } from "@/components/ui/field";
-import { PRIORITY_LABELS, CATEGORY_LABELS } from "../assets/constants/incidentLables";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
-import { Calendar } from "@/components/ui/calendar"
-import AssigneeSelect from "../components/AssigneeSelect";
 import { createIncident } from "../api/incidents";
+import FormField from "../components/FormField.jsx";
+import DueDatePicker from "../components/DueDatePicker.jsx"
+import { PrioritySelect, CategorySelect } from "../components/IncidentSelects.jsx";
+import AssigneeSelect from "../components/AssigneeSelect";
+import { inputStyle, colors } from "../assets/constants/formStyles.js"
+
+const DEFAULT_VALUES = {
+    title: "",
+    description: "",
+    priority: "MEDIUM",
+    category: "GENERAL",
+    dueAt: null,
+    assigneeIds: [],
+};
+
+async function submitIncident(data) {
+    const payload = {
+        ...data,
+        dueAt: data.dueAt ? data.dueAt.toISOString().split("T")[0] : null,
+    };
+    return createIncident(payload);
+}
+
 export default function ReportIncident() {
     const {
         register,
         handleSubmit,
         control,
         formState: { errors, isSubmitting },
-    } = useForm({
-        defaultValues: {
-            title: "",
-            description: "",
-            priority: "MEDIUM",
-            category: "GENERAL",
-            dueAt: "",
-            assigneeIds: [],
-        },
-    });
+    } = useForm({ defaultValues: DEFAULT_VALUES });
+
     const onSubmit = async (data) => {
-        const payload = {
-            ...data,
-            dueAt: data.dueAt
-                ? data.dueAt.toISOString().split("T")[0]
-                : null,
-        };
-        console.log(payload);
-        try{
-            const response = await createIncident(payload);
-            toast.success("Created Ticket!");
-            console.log(response);
-        }catch(error){
-            toast.error(
-                error.response?.data?.message || "Failed to create Incident"
-            );
+        try {
+            await submitIncident(data);
+            toast.success("Incident created");
+        } catch (error) {
+            toast.error(error.response?.data?.message ?? "Failed to create incident");
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto rounded-xl p-8" >
-            <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: "#C4714A" }}>
+        <div className="max-w-2xl mx-auto rounded-xl p-8">
+            <p
+                className="text-xs font-medium uppercase tracking-widest mb-1"
+                style={{ color: colors.accent }}
+            >
                 Incident Management
             </p>
-            <h2 className="text-xl mb-7 font-black">
-                Report new incident
-            </h2>
+            <h2 className="text-xl mb-7 font-black">Report new incident</h2>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <Field>
-                    <Label
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#8A9BAA" }}
-                    >
-                        Title
-                    </Label>
+                <FormField label="Title" error={errors.title?.message}>
                     <Input
                         placeholder="e.g. Database outage in prod"
                         className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
-                        style={{ background: "#F5F0E8", color: "#1C2B3A" }}
+                        style={inputStyle}
                         {...register("title", { required: "Title is required" })}
                     />
-                    {errors.title && (
-                        <p className="text-xs mt-1" style={{ color: "#C4714A" }}>
-                            {errors.title.message}
-                        </p>
-                    )}
-                </Field>
-                <Field>
-                    <Label
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#8A9BAA" }}
-                    >
-                        Description
-                    </Label>
+                </FormField>
+
+                <FormField label="Description" error={errors.description?.message}>
                     <Textarea
                         rows={5}
                         placeholder="Describe what's happening, what's affected, and any steps already taken…"
                         className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20 resize-y"
-                        style={{ background: "#F5F0E8", color: "#1C2B3A" }}
-                        {...register("description",{ required: "Description is required" })}
+                        style={inputStyle}
+                        {...register("description", { required: "Description is required" })}
                     />
-                </Field>
-                <hr style={{ borderColor: "rgba(138,155,170,0.15)" }} />
-                <div className="grid grid-cols-2 gap-4">
-                    <Field>
-                        <Label
-                            className="text-xs font-medium uppercase tracking-wider"
-                            style={{ color: "#8A9BAA" }}
-                        >
-                            Priority
-                        </Label>
-                        <Controller
-                            control={control}
-                            name="priority"
-                            render={({ field }) => (
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <SelectTrigger
-                                        className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
-                                        style={{ background: "#F5F0E8", color: "#1C2B3A" }}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent style={{ background: "#F5F0E8", color: "#1C2B3A" }}>
-                                        {PRIORITY_LABELS.map((p) => (
-                                            <SelectItem key={p} value={p}>{p}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
-                    </Field>
+                </FormField>
 
-                    <Field>
-                        <Label
-                            className="text-xs font-medium uppercase tracking-wider"
-                            style={{ color: "#8A9BAA" }}
-                        >
-                            Category
-                        </Label>
-                        <Controller
-                            control={control}
-                            name="category"
-                            render={({ field }) => (
-                                <Select value={field.value} onValueChange={field.onChange}>
-                                    <SelectTrigger
-                                        className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
-                                        style={{ background: "#F5F0E8", color: "#1C2B3A" }}
-                                    >
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent style={{ background: "#F5F0E8", color: "#1C2B3A" }}>
-                                        {Object.keys(CATEGORY_LABELS).map((c) => (
-                                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
-                    </Field>
+                <hr style={{ borderColor: "rgba(138,155,170,0.15)" }} />
+
+                <div className="grid grid-cols-2 gap-4">
+                    <PrioritySelect control={control} />
+                    <CategorySelect control={control} />
                 </div>
-                <Field>
-                    <Label
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#8A9BAA" }}
-                    >
-                        Due date
-                    </Label>
-                    <Controller
-                        control={control}
-                        name="dueAt"
-                        rules={{ required: "Due Date is required" }}
-                        render={({ field }) => (
-                            <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => field.onChange(date)}
-                                className="rounded-lg border bg-white"
-                                captionLayout="dropdown"
-                                fromYear={new Date().getFullYear()}
-                                toYear={2030}
-                            />
-                        )}
-                    />
-                    {errors.dueAt && (
-                        <p
-                            className="text-xs mt-1"
-                            style={{ color: "#C4714A" }}
-                        >
-                            {errors.dueAt.message}
-                        </p>
-                    )}
-                </Field>
-                <Field>
-                    <Label
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#8A9BAA" }}
-                    >
-                        Assign Members
-                    </Label>
+
+                <DueDatePicker control={control} error={errors.dueAt?.message} />
+
+                <FormField label="Assign members" error={errors.assigneeIds?.message}>
                     <Controller
                         control={control}
                         name="assigneeIds"
                         render={({ field }) => (
-                            <AssigneeSelect
-                                value={field.value}
-                                onChange={field.onChange}
-                            />
+                            <AssigneeSelect value={field.value} onChange={field.onChange} />
                         )}
                     />
-                    {errors.assigneeIds && (
-                        <p
-                            className="text-xs mt-1"
-                            style={{ color: "#C4714A" }}
-                        >
-                            {errors.assigneeIds.message}
-                        </p>
-                    )}
-                </Field>
+                </FormField>
+
                 <Button
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full font-medium"
-                    style={{ background: "#C4714A", color: "#FAFAF7", border: "none" }}
+                    style={{ background: colors.accent, color: colors.offWhite, border: "none" }}
                 >
-                    {isSubmitting ? "Creating..." : "Create incident"}
+                    {isSubmitting ? "Creating…" : "Create incident"}
                 </Button>
             </form>
         </div>
