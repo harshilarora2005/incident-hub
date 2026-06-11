@@ -27,7 +27,7 @@ export default function IncidentsPage() {
     }, []);
 
     const byStatus = (status) => incidents.filter((i) => i.status === status);
-    const handleQuickCreated = (incident) =>setIncidents((prev) => [incident, ...prev]);
+    const handleQuickCreated = (incident)=>setIncidents((prev) => [incident, ...prev]);
 
     const onDragEnd = async ({ source, destination, draggableId }) => {
         if (!destination) return;

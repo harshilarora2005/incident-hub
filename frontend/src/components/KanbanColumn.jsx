@@ -9,7 +9,6 @@ import { toast } from "sonner";
 export function KanbanColumn({ column, incidents, onQuickCreated }) {
     const [isCreating, setIsCreating] = useState(false);
     const isResolved = column.key === "RESOLVED";
-
     const handleSave = async (form) => {
         const payload = {
             title: form.title,

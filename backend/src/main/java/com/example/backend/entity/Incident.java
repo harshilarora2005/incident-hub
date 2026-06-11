@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Table(name = "incidents")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
-@SQLRestriction("is_deleted = false")
+@SQLRestriction("deleted_at IS NULL")
 public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

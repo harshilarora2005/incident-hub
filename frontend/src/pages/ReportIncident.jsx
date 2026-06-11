@@ -9,6 +9,7 @@ import DueDatePicker from "../components/DueDatePicker.jsx"
 import { PrioritySelect, CategorySelect } from "../components/IncidentSelects.jsx";
 import AssigneeSelect from "../components/AssigneeSelect";
 import { inputStyle, colors } from "../assets/constants/formStyles.js"
+import { useNavigate } from "react-router";
 
 const DEFAULT_VALUES = {
     title: "",
@@ -34,11 +35,12 @@ export default function ReportIncident() {
         control,
         formState: { errors, isSubmitting },
     } = useForm({ defaultValues: DEFAULT_VALUES });
-
+    const navigate = useNavigate();
     const onSubmit = async (data) => {
         try {
             await submitIncident(data);
             toast.success("Incident created");
+            navigate("/incidents")
         } catch (error) {
             toast.error(error.response?.data?.message ?? "Failed to create incident");
         }
@@ -48,8 +50,7 @@ export default function ReportIncident() {
         <div className="max-w-2xl mx-auto rounded-xl p-8">
             <p
                 className="text-xs font-medium uppercase tracking-widest mb-1"
-                style={{ color: colors.accent }}
-            >
+                style={{ color: colors.accent }}>
                 Incident Management
             </p>
             <h2 className="text-xl mb-7 font-black">Report new incident</h2>

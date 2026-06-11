@@ -4,16 +4,15 @@ import {
     PROGRESS_BAR_COLOR,
     SEVERITY_STYLES,
 } from "../assets/constants/incidentStyles";
+import { format, parseISO } from "date-fns";
 import AssigneeFleet from "./AssigneeFleet";
 import { CATEGORY_LABELS } from "../assets/constants/incidentLables";
 export function IncidentCard({ incident }) {
+    console.log(incident)
     const isResolved = incident.status === "RESOLVED";
-    const createdDate = new Date(incident.createdAt);
-    const formattedDate = new Intl.DateTimeFormat("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    }).format(createdDate);
+    const formattedDate = incident.dueAt
+    ? format(parseISO(incident.dueAt), "dd MMM yyyy")
+    : "-";
     return (
         <div className="bg-[#FAFAF7] rounded-xl border border-[rgba(138,155,170,0.15)] p-3 mb-2 cursor-pointer hover:border-[rgba(196,113,74,0.3)] transition-colors">
             <div className="flex flex-wrap gap-1.5 mb-2">
