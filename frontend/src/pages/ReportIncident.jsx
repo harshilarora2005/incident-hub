@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar"
 import AssigneeSelect from "../components/AssigneeSelect";
 import { createIncident } from "../api/incidents";
 export default function ReportIncident() {
@@ -34,7 +35,9 @@ export default function ReportIncident() {
     const onSubmit = async (data) => {
         const payload = {
             ...data,
-            dueAt: data.dueAt ? new Date(data.dueAt).toISOString() : null,
+            dueAt: data.dueAt
+                ? data.dueAt.toISOString().split("T")[0]
+                : null,
         };
         console.log(payload);
         try{
@@ -157,12 +160,30 @@ export default function ReportIncident() {
                     >
                         Due date
                     </Label>
-                    <Input
-                        type="datetime-local"
-                        className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
-                        style={{ background: "#F5F0E8", color: "#1C2B3A", colorScheme: "light" }}
-                        {...register("dueAt",{ required: "Due Date is required" })}
+                    <Controller
+                        control={control}
+                        name="dueAt"
+                        rules={{ required: "Due Date is required" }}
+                        render={({ field }) => (
+                            <Calendar
+                                mode="single"
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => field.onChange(date)}
+                                className="rounded-lg border bg-white"
+                                captionLayout="dropdown"
+                                fromYear={new Date().getFullYear()}
+                                toYear={2030}
+                            />
+                        )}
                     />
+                    {errors.dueAt && (
+                        <p
+                            className="text-xs mt-1"
+                            style={{ color: "#C4714A" }}
+                        >
+                            {errors.dueAt.message}
+                        </p>
+                    )}
                 </Field>
                 <Field>
                     <Label

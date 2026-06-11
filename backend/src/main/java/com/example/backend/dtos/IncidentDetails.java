@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class IncidentDetails {
     private Integer progress;
     private UserDTO reporter;
     private List<UserDTO> assignees;
-    private Instant dueAt;
+    private LocalDate dueAt;
     private Instant resolvedAt;
     private Instant createdAt;
     private Instant updatedAt;

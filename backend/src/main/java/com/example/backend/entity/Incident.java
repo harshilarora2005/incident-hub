@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
 import java.util.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "incidents")
@@ -50,7 +51,7 @@ public class Incident {
     private Set<User> assignees = new HashSet<>();
 
     @Column(name = "due_at")
-    private Instant dueAt;
+    private LocalDate dueAt;
 
     @Column(name = "resolved_at")
     private Instant resolvedAt;

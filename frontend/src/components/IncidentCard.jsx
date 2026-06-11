@@ -14,11 +14,6 @@ export function IncidentCard({ incident }) {
         month: "short",
         year: "numeric",
     }).format(createdDate);
-    const formattedTime = new Intl.DateTimeFormat("en-IN", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-    }).format(createdDate);
     return (
         <div className="bg-[#FAFAF7] rounded-xl border border-[rgba(138,155,170,0.15)] p-3 mb-2 cursor-pointer hover:border-[rgba(196,113,74,0.3)] transition-colors">
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -109,10 +104,6 @@ export function IncidentCard({ incident }) {
                     <div className="flex flex-col items-end leading-none">
                         <span className="text-[11px] text-[#8A9BAA]">
                             {formattedDate}
-                        </span>
-
-                        <span className="text-[10px] text-[#B0BAC4] mt-1">
-                            {formattedTime}
                         </span>
                     </div>
                 </div>
