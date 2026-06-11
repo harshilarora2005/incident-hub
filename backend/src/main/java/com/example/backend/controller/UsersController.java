@@ -1,11 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.dtos.AuthResponse;
+import com.example.backend.dtos.UpdateNameRequest;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,11 +34,13 @@ public class UsersController {
     public List<UserDTO> getAllUsers() {
         return userService.findAll();
     }
+
     @PatchMapping("/me/name")
-    public ResponseEntity<UserDTO> updateUserName(@PathVariable String name, Authentication authentication) {
+    public ResponseEntity<UserDTO> updateUserName(@Valid @RequestBody UpdateNameRequest req, Authentication authentication) {
         AuthResponse au = authService.getCurrentUser(authentication);
-        return ResponseEntity.ok(userService.updateDisplayName(name, au.getUserId()));
+        return ResponseEntity.ok(userService.updateDisplayName(req.getNewName(), au.getUserId()));
     }
+
     @PatchMapping("/me/avatar")
     public ResponseEntity<UserDTO> uploadAvatar(@RequestParam("file") MultipartFile file, Authentication authentication) {
         AuthResponse au = authService.getCurrentUser(authentication);

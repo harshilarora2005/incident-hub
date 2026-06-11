@@ -4,6 +4,11 @@ export const getAllUsers = async () => {
     return response.data;
 };
 
+export const updateUserName = async (username) => {
+    const response = await api.patch("users/me/name",username);
+    return response.data;
+}
+
 export const uploadAvatar = async (file) => {
     const form = new FormData();
     form.append("file", file);

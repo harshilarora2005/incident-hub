@@ -1,14 +1,14 @@
 import { useState, useRef } from "react";
-import { Camera, Mail, Shield, User } from "lucide-react";
+import { Camera, Shield, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import FormField from "../components/FormField";
 import { colors, inputStyle } from "../assets/constants/formStyles";
-import { uploadAvatar} from "../api/userApi";
+import { uploadAvatar,updateUserName} from "../api/userApi";
 import { cn } from "@/lib/utils";
 import { ROLE_LABELS } from "../assets/constants/roleLabels";
 import useAuth from "../hooks/useAuth";
-
+import { Button } from "@/components/ui/button";
 function RoleBadge({ role }) {
     const style = ROLE_LABELS[role] ?? { label: role, bg: "rgba(138,155,170,0.12)", color: "#8A9BAA" };
     return (
@@ -109,12 +109,33 @@ function SectionHeader({ icon: Icon, label }) {
 export default function AccountPage() {
     const { user, setUser } = useAuth();
     const [name, setName] = useState(user.name);
+    const [saving, setSaving] = useState(false);
+    const handleSaveName = async () => {
+        if (name.trim() === user.name) return;
+        try {
+            setSaving(true);
+            const payload={
+                newName:name
+            }
+            const updatedUser = await updateUserName(payload);
+            setUser((u) => ({
+                ...u,
+                name: updatedUser.name,
+            }));
+
+            toast.success("Display name updated");
+        } catch {
+            toast.error("Failed to update display name");
+            setName(user.name);
+        } finally {
+            setSaving(false);
+        }
+    };
     return (
         <div className="max-w-2xl mx-auto p-8">
             <p
                 className="text-xs font-medium uppercase tracking-widest mb-1"
-                style={{ color: colors.accent }}
-            >
+                style={{ color: colors.accent }}>
                 Settings
             </p>
             <h2 className="text-xl font-black mb-7">Account</h2>
@@ -147,30 +168,24 @@ export default function AccountPage() {
                 style={{ background: colors.surface }}
             >
                 <SectionHeader icon={User} label="Profile" />
-
                 <FormField label="Display name">
-                    <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Your name"
-                        disabled
-                        className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
-                        style={inputStyle}
-                    />
+                    <div className="flex gap-2">
+                        <Input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Your name"
+                            className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
+                            style={inputStyle}
+                        />
+
+                        <Button
+                            onClick={handleSaveName}
+                            disabled={saving || name.trim() === user.name}
+                        >
+                            Save
+                        </Button>
+                    </div>
                 </FormField>
-
-                <hr style={{ borderColor: "rgba(138,155,170,0.15)" }} />
-                <SectionHeader icon={Mail} label="Contact" />
-
-                <FormField label="Email">
-                    <Input
-                        value={user.email}
-                        disabled
-                        className="border-transparent opacity-60 cursor-not-allowed"
-                        style={inputStyle}
-                    />
-                </FormField>
-
                 <hr style={{ borderColor: "rgba(138,155,170,0.15)" }} />
                 <SectionHeader icon={Shield} label="Roles" />
 
