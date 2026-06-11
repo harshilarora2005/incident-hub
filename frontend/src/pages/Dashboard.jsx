@@ -57,15 +57,6 @@ export default function Dashboard() {
                             </p>
                         </div>
                     </div>
-
-                    <div className="mt-8 flex gap-3">
-                        <button
-                            className="px-5 py-3 rounded-2xl bg-[#877D7A] text-white font-medium hover:opacity-90 transition"
-                            onClick={()=>navigate("/create-incident")}
-                        >
-                            Create Incident
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

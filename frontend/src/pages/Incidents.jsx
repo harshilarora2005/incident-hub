@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Plus} from "lucide-react";
 import { KanbanColumn } from "../components/KanbanColumn";
 import { useEffect } from "react";
-import { getAllIncidents } from "../api/incidents";
+import { getMyIncidents } from "../api/incidents";
+import { useNavigate } from "react-router";
 const COLUMNS = [
     { key: "OPEN", label: "Open", dot: "#8A9BAA" },
     { key: "IN_PROGRESS", label: "In Progress", dot: "#C4714A" },
@@ -14,11 +15,11 @@ export default function IncidentsPage() {
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchIncidents = async () => {
             try {
-                const result = await getAllIncidents();
+                const result = await getMyIncidents();
                 console.log(result.data)
                 setIncidents(result.data);
             } catch (err) {
@@ -50,7 +51,8 @@ export default function IncidentsPage() {
         <div className="p-6 min-h-full" style={{ background: "#F0EDE8" }}>
             <div className="flex items-center justify-between mb-5">
                 <h1 className="text-[16px] font-medium text-[#111D28]">Incidents</h1>
-                <button className="flex items-center gap-1.5 bg-[#C4714A] hover:bg-[#b5633e] text-[#FAFAF7] text-[13px] font-medium px-3.5 py-1.5 rounded-lg transition-colors">
+                <button className="flex items-center gap-1.5 bg-[#C4714A] hover:bg-[#b5633e] text-[#FAFAF7] text-[13px] font-medium px-3.5 py-1.5 rounded-lg transition-colors"
+                onClick={()=>navigate("/report-incident")}>
                     <Plus size={15} />
                     New incident
                 </button>

@@ -42,7 +42,7 @@ const router = createBrowserRouter([
                                 element: <h1>Settings</h1>,
                             },
                             {
-                                path: "/create-incident",
+                                path: "/report-incident",
                                 element: <ReportIncident/>
                             }
                         ],

@@ -67,7 +67,7 @@ export default function AssigneeSelect({value = [],onChange,}) {
             >
                 <ComboboxValue>
                     {(values) => (
-                        <>
+                        <di>
                             {values.map((id) => {
                                 const user = userMap[id];
 
@@ -100,7 +100,7 @@ export default function AssigneeSelect({value = [],onChange,}) {
                             })}
 
                             <ComboboxChipsInput />
-                        </>
+                        </di>
                     )}
                 </ComboboxValue>
             </ComboboxChips>
@@ -116,6 +116,7 @@ export default function AssigneeSelect({value = [],onChange,}) {
 
                         return (
                             <ComboboxItem
+                            className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
                                 key={item.value}
                                 value={item.value}
                             >
