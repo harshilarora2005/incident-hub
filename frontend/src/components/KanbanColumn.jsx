@@ -5,9 +5,11 @@ import { IncidentCard } from "./IncidentCard";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
-
+import Dialog from "@mui/material/Dialog";
+import IncidentDetailsPage from "./IncidentDetailsPage";
 export function KanbanColumn({ column, incidents, onQuickCreated }) {
     const [isCreating, setIsCreating] = useState(false);
+    const [open, setOpen] = useState(false);
     const isResolved = column.key === "RESOLVED";
     const handleSave = async (form) => {
         const payload = {
@@ -78,8 +80,17 @@ export function KanbanColumn({ column, incidents, onQuickCreated }) {
                                                 : "none",
                                         }}
                                     >
-                                        <IncidentCard incident={incident} />
+                                        <div onClick={()=>setOpen(true)}> <IncidentCard incident={incident} /></div>
+                                        <Dialog
+                                        open={open}
+                                        onClose={() => setOpen(false)}
+                                        maxWidth="l"
+                                        fullWidth
+                                    >
+                                        <IncidentDetailsPage incident={incident} />
+                                    </Dialog>
                                     </div>
+                                    
                                 )}
                             </Draggable>
                         ))}
