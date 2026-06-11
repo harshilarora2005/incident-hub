@@ -84,7 +84,7 @@ export default function NavUser({ user, open }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem  onClick={()=>navigate("/account")}>
                         <User className="mr-2 h-4 w-4" />
                         Profile
                     </DropdownMenuItem>

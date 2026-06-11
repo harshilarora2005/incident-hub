@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layout/DashboardLayout";
 import IncidentsPage from "./pages/Incidents";
 import ReportIncident from "./pages/ReportIncident";
+import AccountPage from "./pages/AccountPage";
 const router = createBrowserRouter([
     {
         element: <App />,
@@ -34,8 +35,8 @@ const router = createBrowserRouter([
                                 element: <IncidentsPage/>,
                             },
                             {
-                                path: "/users",
-                                element: <h1>Users</h1>,
+                                path: "/account",
+                                element: <AccountPage/>,
                             },
                             {
                                 path: "/settings",
