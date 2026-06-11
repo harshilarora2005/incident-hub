@@ -48,7 +48,7 @@ public class IncidentService {
                 .title(r.getTitle())
                 .status(r.getStatus() == null ? IncidentStatus.OPEN : r.getStatus())
                 .dueAt(r.getDueAt())
-                .progress(0)
+                .progress(resolveProgress(r.getStatus()))
                 .reporter(reporter)
                 .assignees(assignees)
                 .build();
@@ -83,7 +83,7 @@ public class IncidentService {
                 .map(mapper::toDto)
                 .toList();
     }
-    
+
     private Set<User> resolveAssignees(List<Long> assigneeIds, boolean strict) {
         if (assigneeIds == null || assigneeIds.isEmpty()) return new HashSet<>();
 
@@ -92,5 +92,16 @@ public class IncidentService {
             throw new CustomExceptionHandler("One or more assignees were not found");
         }
         return new HashSet<>(found);
+    }
+
+    private Integer resolveProgress(IncidentStatus status) {
+        Integer progress = switch(status){
+            case OPEN -> 0;
+            case IN_PROGRESS -> 50;
+            case REVIEW -> 90;
+            case RESOLVED -> 100;
+            default -> 0;
+        };
+        return progress;
     }
 }
