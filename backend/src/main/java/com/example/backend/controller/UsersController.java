@@ -27,8 +27,7 @@ public class UsersController {
         userService.updateRole(id, role);
         return ResponseEntity.noContent().build();
     }
-
-    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.findAll();

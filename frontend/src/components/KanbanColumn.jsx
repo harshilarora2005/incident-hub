@@ -4,8 +4,10 @@ import { IncidentCard } from "./IncidentCard";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
+
 export function KanbanColumn({ column, incidents }) {
     const [isCreating, setIsCreating] = useState(false);
+
     const handleSave = async (form) => {
         const payload = {
             title: form.title,
@@ -13,7 +15,6 @@ export function KanbanColumn({ column, incidents }) {
             dueAt: form.dueAt ? form.dueAt.toISOString().split("T")[0] : null,
             assigneeIds: form.assigneeIds,
         };
-
         try {
             await createQuick(payload);
             toast.success("Incident created");
@@ -23,6 +24,8 @@ export function KanbanColumn({ column, incidents }) {
             setIsCreating(false);
         }
     };
+
+    const isResolved = column.key === "RESOLVED";
 
     return (
         <div className="flex flex-col min-w-0">
@@ -41,27 +44,31 @@ export function KanbanColumn({ column, incidents }) {
                 </div>
                 <MoreHorizontal size={16} className="text-[#8A9BAA] cursor-pointer" />
             </div>
+
             <div className="space-y-2">
                 {incidents.map((incident) => (
                     <IncidentCard key={incident.id} incident={incident} />
                 ))}
             </div>
-            <div className="mt-2">
-                {isCreating ? (
-                    <QuickCreateCard
-                        onSave={handleSave}
-                        onCancel={() => setIsCreating(false)}
-                    />
-                ) : (
-                    <button
-                        onClick={() => setIsCreating(true)}
-                        className="flex items-center gap-1.5 w-full px-2.5 py-2 rounded-lg border border-dashed border-[rgba(138,155,170,0.4)] text-[12px] text-[#8A9BAA] hover:bg-[rgba(138,155,170,0.06)] hover:text-[#C4714A] transition-colors"
-                    >
-                        <Plus size={14} />
-                        Add incident
-                    </button>
-                )}
-            </div>
+
+            {!isResolved && (
+                <div className="mt-2">
+                    {isCreating ? (
+                        <QuickCreateCard
+                            onSave={handleSave}
+                            onCancel={() => setIsCreating(false)}
+                        />
+                    ) : (
+                        <button
+                            onClick={() => setIsCreating(true)}
+                            className="flex items-center gap-1.5 w-full px-2.5 py-2 rounded-lg border border-dashed border-[rgba(138,155,170,0.4)] text-[12px] text-[#8A9BAA] hover:bg-[rgba(138,155,170,0.06)] hover:text-[#C4714A] transition-colors"
+                        >
+                            <Plus size={14} />
+                            Add incident
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
