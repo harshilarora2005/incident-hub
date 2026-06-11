@@ -11,9 +11,8 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,30 +20,16 @@ public class IncidentService {
     private final IncidentRepository incidents;
     private final UserRepository users;
     private final IncidentMapper mapper;
+
+    @Transactional
     public IncidentDetails create(CreateRequest r, User reporter) {
-        Set<User> assignees = new HashSet<>();
-        if (r.getAssigneeIds() != null && !r.getAssigneeIds().isEmpty()) {
-            List<User> usersFound = users.findAllById(r.getAssigneeIds());
-            if (usersFound.size() != r.getAssigneeIds().size()) {
-                throw new CustomExceptionHandler(
-                        "One or more assignees were not found"
-                );
-            }
-            assignees.addAll(usersFound);
-        }
+        Set<User> assignees = resolveAssignees(r.getAssigneeIds(), true);
+
         Incident incident = Incident.builder()
                 .title(r.getTitle())
                 .description(r.getDescription())
-                .priority(
-                        r.getPriority() == null
-                                ? IncidentPriority.MEDIUM
-                                : r.getPriority()
-                )
-                .category(
-                        r.getCategory() == null
-                                ? IncidentCategory.GENERAL
-                                : r.getCategory()
-                )
+                .priority(r.getPriority() == null ? IncidentPriority.MEDIUM : r.getPriority())
+                .category(r.getCategory() == null ? IncidentCategory.GENERAL : r.getCategory())
                 .dueAt(r.getDueAt())
                 .status(IncidentStatus.OPEN)
                 .progress(0)
@@ -52,10 +37,25 @@ public class IncidentService {
                 .assignees(assignees)
                 .build();
 
-        incident = incidents.save(incident);
-        IncidentDetails inc = mapper.toDto(incident);
-        return inc;
+        return mapper.toDto(incidents.save(incident));
     }
+
+    @Transactional
+    public IncidentDetails createQuick(QuickCreateRequest r, User reporter) {
+        Set<User> assignees = resolveAssignees(r.getAssigneeIds(), false);
+
+        Incident incident = Incident.builder()
+                .title(r.getTitle())
+                .status(r.getStatus() == null ? IncidentStatus.OPEN : r.getStatus())
+                .dueAt(r.getDueAt())
+                .progress(0)
+                .reporter(reporter)
+                .assignees(assignees)
+                .build();
+
+        return mapper.toDto(incidents.save(incident));
+    }
+
     @Transactional(readOnly = true)
     public List<IncidentDetails> findAll() {
         return incidents.findAllByOrderByCreatedAtDesc()
@@ -66,43 +66,31 @@ public class IncidentService {
 
     @Transactional(readOnly = true)
     public IncidentDetails findById(Long id) {
-        return mapper.toDto(incidents.findById(id).orElseThrow(() ->
-                new CustomExceptionHandler(
-                        "Incident with id " + id + " not found"
-                )
-        ));
+        return mapper.toDto(
+                incidents.findById(id).orElseThrow(() ->
+                        new CustomExceptionHandler("Incident with id " + id + " not found"))
+        );
     }
 
     @Transactional(readOnly = true)
     public List<IncidentDetails> getIncidentsForUser(Long userId) {
-       User us = users.findById(userId).orElseThrow(()->
-               new CustomExceptionHandler("User not found"));
-        Set<Incident> li = us.getAssignedIncidents()
+        User user = users.findById(userId).orElseThrow(() ->
+                new CustomExceptionHandler("User not found"));
+
+        return user.getAssignedIncidents()
                 .stream()
-                .sorted(
-                        Comparator.comparing(Incident::getCreatedAt)
-                                .reversed()
-                )
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-       return li.stream().map(mapper::toDto).toList();
+                .sorted(Comparator.comparing(Incident::getCreatedAt).reversed())
+                .map(mapper::toDto)
+                .toList();
     }
-    @Transactional
-    public IncidentDetails createQuick(QuickCreateRequest r, User reporter) {
-        Incident incident = Incident.builder()
-                .title(r.getTitle())
-                .status(
-                        r.getStatus() == null
-                                ? IncidentStatus.OPEN
-                                : r.getStatus()
-                )
-                .assignees()
-                .progress(0)
-                .reporter(reporter)
-                .assignees(new HashSet<>())
-                .build();
-        Incident savedIncident = incidents.save(incident);
-        return mapper.toDto(savedIncident);
-    }
+    
+    private Set<User> resolveAssignees(List<Long> assigneeIds, boolean strict) {
+        if (assigneeIds == null || assigneeIds.isEmpty()) return new HashSet<>();
 
+        List<User> found = users.findAllById(assigneeIds);
+        if (strict && found.size() != assigneeIds.size()) {
+            throw new CustomExceptionHandler("One or more assignees were not found");
+        }
+        return new HashSet<>(found);
+    }
 }
