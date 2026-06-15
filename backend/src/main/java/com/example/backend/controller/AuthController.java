@@ -1,13 +1,14 @@
 package com.example.backend.controller;
 
+import com.example.backend.dtos.AppUserDetails;
 import com.example.backend.dtos.AuthRecords.*;
 import com.example.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -20,16 +21,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
-            HttpServletResponse response) {
-        return ResponseEntity.ok(
-                authService.login(request, response)
-        );
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(request, response));
     }
     @GetMapping("/me")
-    public ResponseEntity<AuthResponse> me(Authentication authentication) {
-        System.out.println(authentication);
-        return ResponseEntity.ok(authService.getCurrentUser(authentication));
+    public ResponseEntity<AuthResponse> me(@AuthenticationPrincipal AppUserDetails userDetails) {
+        return ResponseEntity.ok(new AuthResponse(
+                userDetails.getId(),
+                userDetails.getName(),
+                userDetails.getEmail(),
+                userDetails.getRoles(),
+                userDetails.getAvatarUrl()
+        ));
     }
 
     @PostMapping("/logout")

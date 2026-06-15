@@ -90,8 +90,6 @@ public class IncidentService {
                 .toList();
     }
 
-    // --- helpers ---
-
     private Incident findIncidentById(Long id) {
         return incidentRepository.findById(id)
                 .orElseThrow(() -> new CustomExceptionHandler("Incident with id " + id + " not found"));
