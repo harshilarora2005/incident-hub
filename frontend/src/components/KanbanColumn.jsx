@@ -7,7 +7,7 @@ import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
 import Dialog from "@mui/material/Dialog";
 import IncidentDetailsPage from "./IncidentDetailsPage";
-function DraggableIncidentCard({ incident, index }) {
+function DraggableIncidentCard({ incident, index, onUpdated}) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -39,7 +39,8 @@ function DraggableIncidentCard({ incident, index }) {
                         maxWidth="lg"
                         fullWidth
                     >
-                        <IncidentDetailsPage incident={incident} />
+                        <IncidentDetailsPage incident={incident}
+                        onUpdated={onUpdated} />
                     </Dialog>
                 </div>
             )}
@@ -47,7 +48,7 @@ function DraggableIncidentCard({ incident, index }) {
     );
 }
 
-export function KanbanColumn({ column, incidents, onQuickCreated }) {
+export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
     const [isCreating, setIsCreating] = useState(false);
     const isResolved = column.key === "RESOLVED";
 
@@ -106,6 +107,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated }) {
                                 key={incident.id}
                                 incident={incident}
                                 index={index}
+                                onUpdated={onUpdated}
                             />
                         ))}
                         {provided.placeholder}

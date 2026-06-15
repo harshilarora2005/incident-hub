@@ -15,7 +15,7 @@ export function InlineSelect({ value, options, onSave }) {
             >
                 <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className='z-1500'>
                 {options.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}

@@ -18,7 +18,9 @@ export function useIncidentEdit(incident, onUpdated) {
             setDraft((prev) => {
                 const next = { ...prev, ...patch };
                 updateIncident(incident.id, next)
-                    .then((updated) => onUpdated?.(updated))
+                    .then((updated) => {
+                        onUpdated?.(updated)
+                        })
                     .catch(() => {
                         setDraft(prev);
                         toast.error("Failed to save changes");

@@ -18,6 +18,13 @@ export default function IncidentsPage() {
     const [loading, setLoading]= useState(true);
     const [error, setError]= useState(null);
     const navigate = useNavigate();
+    const handleIncidentUpdated = (updated) => {
+        setIncidents(prev =>
+            prev.map(i =>
+                i.id === updated.id ? updated : i
+            )
+        );
+    };
 
     useEffect(() => {
         getAllIncidents()
@@ -85,6 +92,7 @@ export default function IncidentsPage() {
                             column={col}
                             incidents={byStatus(col.key)}
                             onQuickCreated={handleQuickCreated}
+                            onUpdated={handleIncidentUpdated}
                         />
                     ))}
                 </div>

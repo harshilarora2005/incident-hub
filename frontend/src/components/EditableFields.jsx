@@ -101,7 +101,7 @@ export function EditableDueDate({ value, onSave }) {
     };
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} >
             <PopoverTrigger asChild>
                 <Button
                     variant="ghost"
@@ -112,7 +112,7 @@ export function EditableDueDate({ value, onSave }) {
                     {parsed ? format(parsed, "d MMM yyyy") : "No due date"}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0" align="start" className='z-1500'>
                 <Calendar
                     mode="single"
                     selected={parsed}
