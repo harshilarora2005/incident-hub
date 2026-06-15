@@ -19,6 +19,7 @@ export function useIncidentEdit(incident, onUpdated) {
                 const next = { ...prev, ...patch };
                 updateIncident(incident.id, next)
                     .then((updated) => {
+                        console.log(updated)
                         onUpdated?.(updated)
                         })
                     .catch(() => {

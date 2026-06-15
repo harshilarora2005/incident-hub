@@ -62,6 +62,7 @@ public class IncidentService {
     @Transactional
     public IncidentDetails updateIncident(Long id, UpdateRequest request) {
         Incident incident = findIncidentById(id);
+        incident.setAssignees(resolveAssignees(request.assigneesIds(),true));
         incidentMapper.updateIncidentFromRequest(request, incident);
         return incidentMapper.toDto(incident);
     }

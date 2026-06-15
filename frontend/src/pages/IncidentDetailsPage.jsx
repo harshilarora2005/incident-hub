@@ -1,13 +1,13 @@
 import { Calendar, Flag, Layers3 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import TimelineEvent from "./TimelineEvent";
-import { StatusBadge, PriorityBadge } from "./Badges";
-import { UserRow } from "./AssigneeFleet";
+import TimelineEvent from "../components/TimelineEvent";
+import { StatusBadge, PriorityBadge } from "../components/Badges";
+import { UserRow } from "../components/AssigneeFleet";
 import { PROGRESS_BAR_COLOR, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../assets/constants/incidentStyles";
 import { useIncidentEdit } from "../hooks/useIncidentEdit";
-import { EditableTitle, EditableDescription,EditableDueDate } from "./EditableFields";
-import { InlineSelect } from "./InlineSelect";
-import AssigneeSelect from "./AssigneeSelect";
+import { EditableTitle, EditableDescription,EditableDueDate } from "../components/EditableFields";
+import { InlineSelect } from "../components/InlineSelect";
+import AssigneeSelect from "../components/AssigneeSelect";
 
 const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -40,7 +40,6 @@ function SidebarField({ icon: Icon, label, children }) {
 export default function IncidentDetailsPage({ incident, onUpdated }) {
     const { draft, save } = useIncidentEdit(incident, onUpdated);
     const progress = incident.progress ?? 0;
-    console.log(draft);
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
             <div

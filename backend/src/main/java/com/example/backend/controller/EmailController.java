@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.UserRecords.EmailContent;
+import com.example.backend.dtos.NotificationRecords.EmailContent;
 import com.example.backend.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

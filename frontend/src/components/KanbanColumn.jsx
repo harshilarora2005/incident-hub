@@ -6,7 +6,7 @@ import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
 import Dialog from "@mui/material/Dialog";
-import IncidentDetailsPage from "./IncidentDetailsPage";
+import IncidentDetailsPage from "../pages/IncidentDetailsPage";
 function DraggableIncidentCard({ incident, index, onUpdated}) {
     const [open, setOpen] = useState(false);
 
