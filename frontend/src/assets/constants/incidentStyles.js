@@ -1,4 +1,11 @@
 import {Clock, CheckCircle2, CircleDot, Timer } from "lucide-react";
+
+export const PROGRESS_BAR_COLOR = {
+    IN_PROGRESS: "bg-[#C4714A]",
+    UNDER_REVIEW: "bg-[#E2A84B]",
+    RESOLVED: "bg-[#4CAF82]",
+};
+
 export const PRIORITY_CONFIG = {
     CRITICAL:{ color: "#dc2626", bg: "rgba(220,38,38,0.08)", label: "Critical" },
     HIGH:{ color: "#ea580c", bg: "rgba(234,88,12,0.08)", label: "High" },

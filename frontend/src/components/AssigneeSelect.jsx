@@ -1,153 +1,95 @@
 import {
-    Combobox,
-    ComboboxChip,
-    ComboboxChips,
-    ComboboxChipsInput,
-    ComboboxContent,
-    ComboboxEmpty,
-    ComboboxItem,
-    ComboboxList,
-    ComboboxValue,
-    useComboboxAnchor,
+    Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput,
+    ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList,
+    ComboboxValue, useComboboxAnchor,
 } from "@/components/ui/combobox";
-
 import { useState, useEffect, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getAllUsers } from "../api/userApi";
+import { UserRow } from "./AssigneeFleet";
 
-export default function AssigneeSelect({value = [],onChange,}) {
+function UserAvatar({ user }) {
+    const initials = (user?.name ?? "?")
+        .split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+    return (
+        <Avatar className="h-4 w-4 shrink-0">
+            <AvatarImage src={user?.avatarUrl} />
+            <AvatarFallback
+                className="text-[9px] font-semibold"
+                style={{ background: "#C4714A", color: "#FAFAF7" }}
+            >
+                {initials}
+            </AvatarFallback>
+        </Avatar>
+    );
+}
+
+export default function AssigneeSelect({ value = [], onChange, single = false }) {
     const anchor = useComboboxAnchor();
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const result = await getAllUsers();
-                setUsers(result);
-            } catch (err) {
-                console.error(err);
-                setError("Failed to load users.");
-            }
-        };
 
-        fetchUsers();
+    useEffect(() => {
+        getAllUsers()
+            .then(setUsers)
+            .catch(() => setError("Failed to load users."));
     }, []);
+
     const userMap = useMemo(
-        () =>
-            Object.fromEntries(
-                users.map((user) => [String(user.id), user])
-            ),
+        () => Object.fromEntries(users.map((u) => [String(u.id), u])),
         [users]
     );
 
-    if (error) {
-        return (
-            <p className="text-sm text-red-500">
-                {error}
-            </p>
-        );
-    }
+    if (error) return <p className="text-[12px] text-red-500">{error}</p>;
 
     return (
         <Combobox
-            multiple
+            multiple={!single}
             autoHighlight
-            items={users.map((user) => ({
-                label: user.name,
-                value: String(user.id),
-            }))}
+            items={users.map((u) => ({ label: u.name, value: String(u.id) }))}
             value={value.map(String)}
-            onValueChange={(values) =>
-                onChange(values.map(Number))
+            onValueChange={(vals) =>
+                onChange(single ? Number(vals[0]) : vals.map(Number))
             }
         >
-            <ComboboxChips
-                ref={anchor}
-                className="w-full"
-            >
+            <ComboboxChips ref={anchor} className="w-full min-h-8 text-[12px]">
                 <ComboboxValue>
                     {(values) => (
-                        <di>
+                        <div className="flex flex-wrap gap-1">
                             {values.map((id) => {
                                 const user = userMap[id];
-
                                 if (!user) return null;
-
                                 return (
-                                    <ComboboxChip key={user.id}>
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="h-5 w-5">
-                                                <AvatarImage
-                                                    src={user.avatarUrl}
-                                                />
-
-                                                <AvatarFallback className="text-[10px]">
-                                                    {user.name
-                                                        .split(" ")
-                                                        .map(
-                                                            (n) => n[0]
-                                                        )
-                                                        .join("")
-                                                        .slice(0, 2)
-                                                        .toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-
-                                            {user.name}
-                                        </div>
+                                    <ComboboxChip
+                                        key={id}
+                                        className="flex items-center gap-1.5 text-[11px] px-1.5 py-0.5"
+                                    >
+                                        <UserAvatar user={user} />
+                                        {user.name}
                                     </ComboboxChip>
                                 );
                             })}
-
-                            <ComboboxChipsInput />
-                        </di>
+                            <ComboboxChipsInput
+                                placeholder={values.length ? "" : "Add assignee..."}
+                                className="text-[12px]"
+                            />
+                        </div>
                     )}
                 </ComboboxValue>
             </ComboboxChips>
-            <ComboboxContent anchor={anchor}>
-                <ComboboxEmpty>
-                    No users found.
-                </ComboboxEmpty>
 
+            <ComboboxContent anchor={anchor}>
+                <ComboboxEmpty>No users found.</ComboboxEmpty>
                 <ComboboxList>
                     {(item) => {
-                        const user =
-                            userMap[item.value];
-
+                        const user = userMap[item.value];
                         return (
                             <ComboboxItem
-                            className="border-transparent focus:border-[#C4714A] focus:ring-[#C4714A]/20"
                                 key={item.value}
                                 value={item.value}
+                                className="focus:bg-[rgba(196,113,74,0.08)]"
                             >
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="h-7 w-7">
-                                        <AvatarImage
-                                            src={user?.avatarUrl}
-                                        />
-
-                                        <AvatarFallback>
-                                            {user?.name
-                                                ?.split(" ")
-                                                .map(
-                                                    (n) => n[0]
-                                                )
-                                                .join("")
-                                                .slice(0, 2)
-                                                .toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-
-                                    <div>
-                                        <p className="text-sm">
-                                            {user?.name}
-                                        </p>
-
-                                        <p className="text-xs text-muted-foreground">
-                                            {user?.email}
-                                        </p>
-                                    </div>
-                                </div>
+                                <UserRow user={user} />
                             </ComboboxItem>
                         );
                     }}

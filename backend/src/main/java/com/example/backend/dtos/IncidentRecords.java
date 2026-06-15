@@ -31,7 +31,7 @@ public class IncidentRecords {
             IncidentPriority priority,
             IncidentCategory category,
             UserDTO reporter,
-            List<UserDTO> assignees,
+            List<Long> assigneesIds,
             LocalDate dueAt
     ) {}
     public record IncidentDetails(

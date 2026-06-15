@@ -24,3 +24,8 @@ export const updateIncidentStatus = async (id, status) => {
     const response = await api.patch(`/incidents/${id}/status`, { status });
     return response.data;
 };
+
+export const updateIncident = async(id,payload)=>{
+    const response = await await api.patch(`/incidents/${id}`, payload);
+    return response.data;
+}
