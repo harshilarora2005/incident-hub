@@ -5,12 +5,54 @@ import { IncidentCard } from "./IncidentCard";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
-import Dialog from "@mui/material/Dialog";
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";
 import IncidentDetailsPage from "./IncidentDetailsPage";
+
+function DraggableIncidentCard({ incident, index }) {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <Draggable
+            key={incident.id}
+            draggableId={String(incident.id)}
+            index={index}
+        >
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={{
+                        ...provided.draggableProps.style,
+                        opacity: snapshot.isDragging ? 0.85 : 1,
+                        borderRadius: 12,
+                        boxShadow: snapshot.isDragging
+                            ? "0 8px 24px rgba(17,29,40,0.15)"
+                            : "none",
+                    }}
+                >
+                    <div onClick={() => setOpen(true)}>
+                        <IncidentCard incident={incident} />
+                    </div>
+
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogContent className="min-w-3xl w-full p-0 overflow-hidden">
+                            <IncidentDetailsPage incident={incident} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            )}
+        </Draggable>
+    );
+}
+
 export function KanbanColumn({ column, incidents, onQuickCreated }) {
     const [isCreating, setIsCreating] = useState(false);
-    const [open, setOpen] = useState(false);
     const isResolved = column.key === "RESOLVED";
+
     const handleSave = async (form) => {
         const payload = {
             title: form.title,
@@ -46,6 +88,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated }) {
                 </div>
                 <MoreHorizontal size={16} className="text-[#8A9BAA] cursor-pointer" />
             </div>
+
             <Droppable droppableId={column.key}>
                 {(provided, snapshot) => (
                     <div
@@ -61,43 +104,17 @@ export function KanbanColumn({ column, incidents, onQuickCreated }) {
                         }}
                     >
                         {incidents.map((incident, index) => (
-                            <Draggable
+                            <DraggableIncidentCard
                                 key={incident.id}
-                                draggableId={String(incident.id)}
+                                incident={incident}
                                 index={index}
-                            >
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        style={{
-                                            ...provided.draggableProps.style,
-                                            opacity: snapshot.isDragging ? 0.85 : 1,
-                                            borderRadius: 12,
-                                            boxShadow: snapshot.isDragging
-                                                ? "0 8px 24px rgba(17,29,40,0.15)"
-                                                : "none",
-                                        }}
-                                    >
-                                        <div onClick={()=>setOpen(true)}> <IncidentCard incident={incident} /></div>
-                                        <Dialog
-                                        open={open}
-                                        onClose={() => setOpen(false)}
-                                        maxWidth="md"
-                                        fullWidth
-                                    >
-                                        <IncidentDetailsPage incident={incident} />
-                                    </Dialog>
-                                    </div>
-                                    
-                                )}
-                            </Draggable>
+                            />
                         ))}
                         {provided.placeholder}
                     </div>
                 )}
             </Droppable>
+
             {!isResolved && (
                 <div className="mt-2">
                     {isCreating ? (
