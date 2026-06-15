@@ -2,7 +2,11 @@ import { Calendar, Flag, Layers3, User } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import AssigneeFleet from "./AssigneeFleet";
-
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
 export default function IncidentDetailsPage({ incident }) {
     const formatDate = (date) =>
         date
@@ -123,9 +127,20 @@ export default function IncidentDetailsPage({ incident }) {
                         <h2 className="font-semibold mb-4">Reporter</h2>
 
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                                <User size={18} />
-                            </div>
+                            <Avatar>
+                            <AvatarImage
+                                src={incident.reporter.avatarUrl}
+                                alt={incident.reporter.name}
+                            />
+                            <AvatarFallback className="bg-[#C4714A] text-[#FAFAF7] text-xs font-medium">
+                                {(incident.reporter?.name ?? "?")
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .slice(0, 2)
+                                    .toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
 
                             <div>
                                 <p className="font-medium">
