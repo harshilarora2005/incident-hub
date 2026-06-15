@@ -1,6 +1,7 @@
 import { Calendar, Flag, Layers3, User } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import AssigneeFleet from "./AssigneeFleet";
 
 export default function IncidentDetailsPage({ incident }) {
     const formatDate = (date) =>
@@ -141,25 +142,7 @@ export default function IncidentDetailsPage({ incident }) {
                         <h2 className="font-semibold mb-4">Assignees</h2>
 
                         <div className="space-y-3">
-                            {incident.assignees?.map((user) => (
-                                <div
-                                    key={user.id}
-                                    className="flex items-center gap-3"
-                                >
-                                    <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                                        <User size={16} />
-                                    </div>
-
-                                    <div>
-                                        <p className="font-medium">
-                                            {user.name}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {user.email}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+                            <AssigneeFleet assignees={incident.assignees} collapseNum={5}/>
                         </div>
                     </div>
                 </div>

@@ -39,8 +39,8 @@ function DraggableIncidentCard({ incident, index }) {
                     </div>
 
                     <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogContent className="min-w-3xl w-full p-0 overflow-hidden">
-                            <IncidentDetailsPage incident={incident} />
+                        <DialogContent className="min-w-3xl w-full p-0 overflow-hidden [&>button]:hidden">
+                            <IncidentDetailsPage incident={incident}  />
                         </DialogContent>
                     </Dialog>
                 </div>
