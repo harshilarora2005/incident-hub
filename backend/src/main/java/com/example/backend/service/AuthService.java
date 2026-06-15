@@ -1,105 +1,102 @@
 package com.example.backend.service;
 
 import com.example.backend.config.JwtUtil;
-import com.example.backend.dtos.AuthResponse;
-import com.example.backend.dtos.LoginRequest;
-import com.example.backend.dtos.RegisterRequest;
+import com.example.backend.dtos.AuthRecords.*;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
 import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.core.Authentication;
+
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepo;
-    private final PasswordEncoder enc;
-    private final JwtUtil jwt;
-    private final AuthenticationManager am;
-    private final EmailService es;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
-    public AuthResponse register(RegisterRequest r, HttpServletResponse response) {
-        if (userRepo.existsByEmail(r.getEmail())) {
+    public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
+        if (userRepository.existsByEmail(request.email())) {
             throw new CustomExceptionHandler("Email already exists");
         }
         User user = User.builder()
-                .email(r.getEmail())
-                .name(r.getName())
-                .passwordHash(enc.encode(r.getPassword()))
-                .roles(new java.util.HashSet<>(Set.of(Role.ENGINEER)))
+                .email(request.email())
+                .name(request.name())
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .roles(new HashSet<>(Set.of(Role.ENGINEER)))
                 .build();
-        userRepo.save(user);
+        userRepository.save(user);
         try {
-            es.sendWelcomeEmail(user.getEmail(), user.getName());
+            emailService.sendWelcomeEmail(user.getEmail(), user.getName());
         } catch (Exception e) {
-            System.err.println("Welcome email failed: " + e.getMessage());
+            log.warn("Welcome email failed for {}: {}", user.getEmail(), e.getMessage());
         }
-        return createAuthResponse(user, response);
+        return buildAuthResponse(user, response);
     }
-    public AuthResponse login(LoginRequest r, HttpServletResponse response) {
-        User user = userRepo.findByEmail(r.getEmail())
+
+    public AuthResponse login(LoginRequest request, HttpServletResponse response) {
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-        if (!enc.matches(r.getPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
-        return createAuthResponse(user, response);
+        return buildAuthResponse(user, response);
     }
 
     public void logout(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie
-                .from("access_token", "")
+        ResponseCookie expiredCookie = ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(false)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
                 .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString());
     }
+
     public AuthResponse getCurrentUser(Authentication authentication) {
         if (authentication == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is null");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
-        String email = authentication.getName();
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new CustomExceptionHandler("User not found"));
-        return new AuthResponse(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRoles(),
-                user.getAvatarUrl()
-        );
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new CustomExceptionHandler("User not found"));
+        return toAuthResponse(user);
     }
 
-    private AuthResponse createAuthResponse(User user, HttpServletResponse response) {
-        Set<String> roleNames = user.getRoles().stream().map(Enum::name).collect(Collectors.toSet());
-        String token = jwt.generateToken(user.getId(), user.getEmail(), roleNames);
-        ResponseCookie cookie = ResponseCookie
-                .from("access_token", token)
+    private AuthResponse buildAuthResponse(User user, HttpServletResponse response) {
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), roleNames);
+        ResponseCookie cookie = ResponseCookie.from("access_token", token)
                 .httpOnly(true)
-                .secure(false) // change to true in production (HTTPS)
+                .secure(false) // set to true in production
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofHours(1))
                 .build();
-
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        return new AuthResponse(user.getId(), user.getEmail(), user.getName(), user.getRoles(),user.getAvatarUrl());
+        return toAuthResponse(user);
     }
 
+    private AuthResponse toAuthResponse(User user) {
+        return new AuthResponse(user.getId(), user.getName(), user.getEmail(), user.getRoles(), user.getAvatarUrl());
+    }
 }

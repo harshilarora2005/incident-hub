@@ -1,7 +1,5 @@
 package com.example.backend.service;
 
-import com.cloudinary.Cloudinary;
-import com.example.backend.dtos.AuthResponse;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
@@ -9,51 +7,49 @@ import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.UserMapper;
 import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Set;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepo;
-    private final UserMapper mapper;
-    private final CloudinaryService service;
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final CloudinaryService cloudinaryService;
+
     @Transactional
     public void updateRole(Long userId, Role role) {
-        User user = userRepo.findById(userId).orElseThrow(() ->
-                        new CustomExceptionHandler("User not found"));
+        User user = findUserById(userId);
         user.getRoles().add(role);
-        userRepo.save(user);
     }
 
     @Transactional(readOnly = true)
     public List<UserDTO> findAll() {
-        return userRepo.findAll()
-                .stream()
-                .map(mapper::toDto)
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
                 .toList();
     }
+
     @Transactional
-    public UserDTO updateDisplayName(String newName,Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() ->new CustomExceptionHandler("User not found"));
+    public UserDTO updateDisplayName(Long userId, String newName) {
+        User user = findUserById(userId);
         user.setName(newName);
-        userRepo.save(user);
-        return mapper.toDto(user);
+        return userMapper.toDto(user);
     }
+
     @Transactional
-    public UserDTO uploadAvatar(MultipartFile file, Long userId) {
-        String avatarUrl = service.uploadAvatar(file,userId);
-        User user = userRepo.findById(userId)
-                        .orElseThrow(() ->new CustomExceptionHandler("User not found"));
-        user.setAvatarUrl(avatarUrl);
-        userRepo.save(user);
-        UserDTO response = mapper.toDto(user);
-        return response;
+    public UserDTO uploadAvatar(Long userId, MultipartFile file) {
+        User user = findUserById(userId);
+        user.setAvatarUrl(cloudinaryService.uploadAvatar(file, userId));
+        return userMapper.toDto(user);
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomExceptionHandler("User not found"));
     }
 }

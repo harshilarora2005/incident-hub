@@ -1,10 +1,9 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.AuthResponse;
-import com.example.backend.dtos.UpdateNameRequest;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.entity.Role;
-import com.example.backend.entity.User;
+import com.example.backend.dtos.UserRecords.UpdateNameRequest;
+import com.example.backend.dtos.AuthRecords.AuthResponse;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -14,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 @RestController
@@ -29,21 +27,19 @@ public class UsersController {
         userService.updateRole(id, role);
         return ResponseEntity.noContent().build();
     }
-
     @GetMapping
     public List<UserDTO> getAllUsers() {
         return userService.findAll();
     }
-
     @PatchMapping("/me/name")
     public ResponseEntity<UserDTO> updateUserName(@Valid @RequestBody UpdateNameRequest req, Authentication authentication) {
         AuthResponse au = authService.getCurrentUser(authentication);
-        return ResponseEntity.ok(userService.updateDisplayName(req.getNewName(), au.getUserId()));
+        return ResponseEntity.ok(userService.updateDisplayName(au.userId(),req.newName()));
     }
 
     @PatchMapping("/me/avatar")
     public ResponseEntity<UserDTO> uploadAvatar(@RequestParam("file") MultipartFile file, Authentication authentication) {
         AuthResponse au = authService.getCurrentUser(authentication);
-        return ResponseEntity.ok(userService.uploadAvatar(file, au.getUserId()));
+        return ResponseEntity.ok(userService.uploadAvatar(au.userId(),file));
     }
 }

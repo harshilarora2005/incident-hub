@@ -1,10 +1,8 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.EmailContent;
+import com.example.backend.dtos.UserRecords.EmailContent;
 import com.example.backend.service.EmailService;
-import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +17,7 @@ public class EmailController {
     @PostMapping("/simple")
     public ResponseEntity<Void> sendSimpleEmail(@RequestBody EmailContent email) {
         try {
-            emailService.sendEmail(email.getRecipient(), email.getSubject(), email.getMsgBody());
+            emailService.sendEmail(email.recipient(), email.subject(), email.msgBody());
         }catch (Exception e){
             return ResponseEntity.badRequest().build();
         }

@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.*;
-import com.example.backend.entity.IncidentStatus;
+import com.example.backend.dtos.AuthRecords.AuthResponse;
+import com.example.backend.dtos.IncidentRecords.*;
 import com.example.backend.service.AuthService;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
@@ -39,11 +39,11 @@ public class IncidentController {
     @GetMapping("/my")
     public List<IncidentDetails> listMy(Authentication authentication){
         AuthResponse au = authService.getCurrentUser(authentication);
-        return service.getIncidentsForUser(au.getUserId());
+        return service.findAllForUser(au.userId());
     }
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest req){
-        service.updateStatus(id,req.getStatus());
+        service.updateStatus(id,req.status());
         return ResponseEntity.ok().build();
     }
     @PatchMapping("/{id}")

@@ -1,9 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dtos.CreateRequest;
-import com.example.backend.dtos.IncidentDetails;
-import com.example.backend.dtos.QuickCreateRequest;
-import com.example.backend.dtos.UpdateRequest;
+import com.example.backend.dtos.IncidentRecords.*;
 import com.example.backend.entity.*;
 import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.IncidentMapper;
@@ -12,108 +9,103 @@ import com.example.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
 
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class IncidentService {
-    private final IncidentRepository incidents;
-    private final UserRepository users;
-    private final IncidentMapper mapper;
+
+    private final IncidentRepository incidentRepository;
+    private final UserRepository userRepository;
+    private final IncidentMapper incidentMapper;
 
     @Transactional
-    public IncidentDetails create(CreateRequest r, User reporter) {
-        Set<User> assignees = resolveAssignees(r.getAssigneeIds(), true);
-
+    public IncidentDetails create(CreateRequest request, User reporter) {
         Incident incident = Incident.builder()
-                .title(r.getTitle())
-                .description(r.getDescription())
-                .priority(r.getPriority() == null ? IncidentPriority.MEDIUM : r.getPriority())
-                .category(r.getCategory() == null ? IncidentCategory.GENERAL : r.getCategory())
-                .dueAt(r.getDueAt())
+                .title(request.title())
+                .description(request.description())
+                .priority(Objects.requireNonNullElse(request.priority(), IncidentPriority.MEDIUM))
+                .category(Objects.requireNonNullElse(request.category(), IncidentCategory.GENERAL))
+                .dueAt(request.dueAt())
                 .status(IncidentStatus.OPEN)
                 .progress(0)
                 .reporter(reporter)
-                .assignees(assignees)
+                .assignees(resolveAssignees(request.assigneeIds(), true))
                 .build();
 
-        return mapper.toDto(incidents.save(incident));
+        return incidentMapper.toDto(incidentRepository.save(incident));
     }
+
+    @Transactional
+    public IncidentDetails createQuick(QuickCreateRequest request, User reporter) {
+        IncidentStatus status = Objects.requireNonNullElse(request.status(), IncidentStatus.OPEN);
+        Incident incident = Incident.builder()
+                .title(request.title())
+                .status(status)
+                .dueAt(request.dueAt())
+                .progress(progressFor(status))
+                .reporter(reporter)
+                .assignees(resolveAssignees(request.assigneeIds(), false))
+                .build();
+
+        return incidentMapper.toDto(incidentRepository.save(incident));
+    }
+
     @Transactional
     public void updateStatus(Long incidentId, IncidentStatus newStatus) {
-        Incident incident = incidents.findById(incidentId).orElseThrow(()->
-                new CustomExceptionHandler("Incident not found")
-        );
-        incident.setProgress(resolveProgress(newStatus));
+        Incident incident = findIncidentById(incidentId);
         incident.setStatus(newStatus);
-        incidents.save(incident);
+        incident.setProgress(progressFor(newStatus));
     }
+
     @Transactional
-    public IncidentDetails createQuick(QuickCreateRequest r, User reporter) {
-        Set<User> assignees = resolveAssignees(r.getAssigneeIds(), false);
-
-        Incident incident = Incident.builder()
-                .title(r.getTitle())
-                .status(r.getStatus() == null ? IncidentStatus.OPEN : r.getStatus())
-                .dueAt(r.getDueAt())
-                .progress(resolveProgress(r.getStatus()))
-                .reporter(reporter)
-                .assignees(assignees)
-                .build();
-
-        return mapper.toDto(incidents.save(incident));
+    public IncidentDetails updateIncident(Long id, UpdateRequest request) {
+        Incident incident = findIncidentById(id);
+        incidentMapper.updateIncidentFromRequest(request, incident);
+        return incidentMapper.toDto(incident);
     }
 
     @Transactional(readOnly = true)
     public List<IncidentDetails> findAll() {
-        return incidents.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(mapper::toDto)
+        return incidentRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(incidentMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public IncidentDetails findById(Long id) {
-        return mapper.toDto(
-                incidents.findById(id).orElseThrow(() ->
-                        new CustomExceptionHandler("Incident with id " + id + " not found"))
-        );
+        return incidentMapper.toDto(findIncidentById(id));
     }
 
     @Transactional(readOnly = true)
-    public List<IncidentDetails> getIncidentsForUser(Long userId) {
-        User user = users.findById(userId).orElseThrow(() ->
-                new CustomExceptionHandler("User not found"));
-
-        return user.getAssignedIncidents()
-                .stream()
+    public List<IncidentDetails> findAllForUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomExceptionHandler("User not found"));
+        return user.getAssignedIncidents().stream()
                 .sorted(Comparator.comparing(Incident::getCreatedAt).reversed())
-                .map(mapper::toDto)
+                .map(incidentMapper::toDto)
                 .toList();
     }
 
-    @Transactional
-    public IncidentDetails updateIncident(Long id,UpdateRequest r) {
-        Incident incident = incidents.findById(id).orElseThrow(()->
-                new CustomExceptionHandler("Incident not found")
-        );
-        mapper.updateIncidentFromRequest(r, incident);
-        return mapper.toDto(incident);
+    // --- helpers ---
+
+    private Incident findIncidentById(Long id) {
+        return incidentRepository.findById(id)
+                .orElseThrow(() -> new CustomExceptionHandler("Incident with id " + id + " not found"));
     }
+
     private Set<User> resolveAssignees(List<Long> assigneeIds, boolean strict) {
         if (assigneeIds == null || assigneeIds.isEmpty()) return new HashSet<>();
-
-        List<User> found = users.findAllById(assigneeIds);
+        List<User> found = userRepository.findAllById(assigneeIds);
         if (strict && found.size() != assigneeIds.size()) {
             throw new CustomExceptionHandler("One or more assignees were not found");
         }
         return new HashSet<>(found);
     }
 
-    private Integer resolveProgress(IncidentStatus status) {
-        return switch(status){
-            case OPEN -> 0;
+    private int progressFor(IncidentStatus status) {
+        return switch (status) {
             case IN_PROGRESS -> 50;
             case REVIEW -> 90;
             case RESOLVED -> 100;
