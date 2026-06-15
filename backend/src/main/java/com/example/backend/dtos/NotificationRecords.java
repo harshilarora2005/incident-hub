@@ -9,10 +9,10 @@ public class NotificationRecords {
             Long id,
             String title,
             String message,
-            Long incidentId,
-            Long senderId,
-            String senderName,
             boolean isRead,
-            Instant createdAt
+            Instant createdAt,
+            Long incidentId,
+            String senderName,
+            String senderAvatar
     ) {}
 }
