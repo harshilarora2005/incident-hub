@@ -33,7 +33,6 @@ export default function IncidentDetailsPage({ incident }) {
 
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
-            {/* Header bar */}
             <div
                 className="px-6 py-3 flex items-center gap-2 border-b shrink-0"
                 style={{ borderColor: "rgba(138,155,170,0.15)", background: "#FAFAF7" }}

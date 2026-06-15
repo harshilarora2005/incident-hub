@@ -1,12 +1,10 @@
 import { Clock, CheckCircle2 } from "lucide-react";
 import {
-    CATEGORY_STYLES,
     PROGRESS_BAR_COLOR,
-    SEVERITY_STYLES,
 } from "../assets/constants/incidentStyles";
 import { format, parseISO } from "date-fns";
 import {AssigneeFleet} from "./AssigneeFleet";
-import { CATEGORY_LABELS } from "../assets/constants/incidentLables";
+import { PriorityBadge, CategoryBadge } from "./Badges";
 export function IncidentCard({ incident }) {
     console.log(incident)
     const isResolved = incident.status === "RESOLVED";
@@ -16,26 +14,8 @@ export function IncidentCard({ incident }) {
     return (
         <div className="bg-[#FAFAF7] rounded-xl border border-[rgba(138,155,170,0.15)] p-3 mb-2 cursor-pointer hover:border-[rgba(196,113,74,0.3)] transition-colors">
             <div className="flex flex-wrap gap-1.5 mb-2">
-                <span
-                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                        SEVERITY_STYLES[incident.priority]
-                    }`}
-                >
-                    {incident.priority.charAt(0) +
-                        incident.priority.slice(1).toLowerCase()}
-                </span>
-
-                {incident.category && (
-                    <span
-                        className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                            CATEGORY_STYLES[incident.category] ??
-                            "bg-gray-100 text-gray-700"
-                        }`}
-                    >
-                        {CATEGORY_LABELS[incident.category] ??
-                            incident.category}
-                    </span>
-                )}
+                <PriorityBadge priority={incident.priority}/>
+                <CategoryBadge category={incident.category}/>
             </div>
 
             <h3 className="text-[13px] font-medium text-[#111D28] leading-snug mb-1.5">
