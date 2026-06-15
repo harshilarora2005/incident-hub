@@ -11,7 +11,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export default function AssigneeFleet({assignees = [],collapseNum,}) {
+export function AssigneeFleet({assignees = [],collapseNum,}) {
     const visibleAssignees = collapseNum ? assignees.slice(0, collapseNum): assignees;
 
     const hiddenCount = collapseNum ? Math.max(0, assignees.length - collapseNum): 0;
@@ -46,5 +46,32 @@ export default function AssigneeFleet({assignees = [],collapseNum,}) {
                 </AvatarGroupCount>
             )}
         </AvatarGroup>
+    );
+}
+
+export function UserRow({ user }) {
+    if (!user) return null;
+    const initials = (user.name ?? "?")
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+    return (
+        <div className="flex items-center gap-2.5">
+            <Avatar className="h-7 w-7">
+                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarFallback
+                    className="text-[10px] font-semibold"
+                    style={{ background: "#C4714A", color: "#FAFAF7" }}
+                >
+                    {initials}
+                </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+                <p className="text-[13px] font-medium text-[#111D28] truncate">{user.name}</p>
+                <p className="text-[11px] text-[#8A9BAA] truncate">{user.email}</p>
+            </div>
+        </div>
     );
 }

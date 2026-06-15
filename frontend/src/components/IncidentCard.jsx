@@ -5,7 +5,7 @@ import {
     SEVERITY_STYLES,
 } from "../assets/constants/incidentStyles";
 import { format, parseISO } from "date-fns";
-import AssigneeFleet from "./AssigneeFleet";
+import {AssigneeFleet} from "./AssigneeFleet";
 import { CATEGORY_LABELS } from "../assets/constants/incidentLables";
 export function IncidentCard({ incident }) {
     console.log(incident)
