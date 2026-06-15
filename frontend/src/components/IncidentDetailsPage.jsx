@@ -1,4 +1,4 @@
-import { Calendar, Flag, Layers3, User } from "lucide-react";
+import { Calendar, Flag, Layers3 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import AssigneeFleet from "./AssigneeFleet";

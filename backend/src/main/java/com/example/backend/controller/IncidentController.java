@@ -46,5 +46,9 @@ public class IncidentController {
         service.updateStatus(id,req.getStatus());
         return ResponseEntity.ok().build();
     }
+    @PatchMapping("/{id}")
+    public ResponseEntity<IncidentDetails> updateIncident(@PathVariable Long id, @RequestBody UpdateRequest request) {
+        return ResponseEntity.ok(service.updateIncident(id, request));
+    }
 
 }

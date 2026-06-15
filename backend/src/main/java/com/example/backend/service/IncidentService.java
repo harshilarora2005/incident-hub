@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dtos.CreateRequest;
 import com.example.backend.dtos.IncidentDetails;
 import com.example.backend.dtos.QuickCreateRequest;
+import com.example.backend.dtos.UpdateRequest;
 import com.example.backend.entity.*;
 import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.mappers.IncidentMapper;
@@ -92,6 +93,14 @@ public class IncidentService {
                 .toList();
     }
 
+    @Transactional
+    public IncidentDetails updateIncident(Long id,UpdateRequest r) {
+        Incident incident = incidents.findById(id).orElseThrow(()->
+                new CustomExceptionHandler("Incident not found")
+        );
+        mapper.updateIncidentFromRequest(r, incident);
+        return mapper.toDto(incident);
+    }
     private Set<User> resolveAssignees(List<Long> assigneeIds, boolean strict) {
         if (assigneeIds == null || assigneeIds.isEmpty()) return new HashSet<>();
 
@@ -103,13 +112,12 @@ public class IncidentService {
     }
 
     private Integer resolveProgress(IncidentStatus status) {
-        Integer progress = switch(status){
+        return switch(status){
             case OPEN -> 0;
             case IN_PROGRESS -> 50;
             case REVIEW -> 90;
             case RESOLVED -> 100;
             default -> 0;
         };
-        return progress;
     }
 }
