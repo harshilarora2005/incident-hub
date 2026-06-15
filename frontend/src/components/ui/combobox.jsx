@@ -92,14 +92,14 @@ function ComboboxContent({
   ...props
 }) {
   return (
-    <ComboboxPrimitive.Portal>
+    <ComboboxPrimitive.Portal >
       <ComboboxPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
         anchor={anchor}
-        className="isolate z-50">
+        className="isolate z-9999">
         <ComboboxPrimitive.Popup
           data-slot="combobox-content"
           data-chips={!!anchor}

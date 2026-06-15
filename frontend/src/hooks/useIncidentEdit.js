@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export function useIncidentEdit(incident, onUpdated) {
     const [draft, setDraft] = useState({
         title:incident.title,
-        description: incident.description ?? "",
+        description:  incident.description ?? "",
         priority:incident.priority,
         category:incident.category,
         status:incident.status,
@@ -15,17 +15,18 @@ export function useIncidentEdit(incident, onUpdated) {
 
     const save = useCallback(
         async (patch) => {
-            const next = { ...draft, ...patch };
-            setDraft(next);
-            try {
-                // const updated = await updateIncident(incident.id, next);
-                // onUpdated?.(updated);
-            } catch {
-                toast.error("Failed to save changes");
-                setDraft(draft); // rollback
-            }
+            setDraft((prev) => {
+                const next = { ...prev, ...patch };
+                updateIncident(incident.id, next)
+                    .then((updated) => onUpdated?.(updated))
+                    .catch(() => {
+                        setDraft(prev);
+                        toast.error("Failed to save changes");
+                    });
+                return next;
+            });
         },
-        [draft, incident.id, onUpdated]
+        [incident.id, onUpdated]
     );
 
     return { draft, save };

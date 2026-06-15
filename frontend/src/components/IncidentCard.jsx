@@ -6,7 +6,6 @@ import { format, parseISO } from "date-fns";
 import {AssigneeFleet} from "./AssigneeFleet";
 import { PriorityBadge, CategoryBadge } from "./Badges";
 export function IncidentCard({ incident }) {
-    console.log(incident)
     const isResolved = incident.status === "RESOLVED";
     const formattedDate = incident.dueAt
     ? format(parseISO(incident.dueAt), "dd MMM yyyy")

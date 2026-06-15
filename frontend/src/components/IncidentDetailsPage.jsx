@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import TimelineEvent from "./TimelineEvent";
 import { StatusBadge, PriorityBadge } from "./Badges";
 import { UserRow } from "./AssigneeFleet";
-import { PROGRESS_BAR_COLOR, PRIORITY_CONFIG, CATEGORY_CONFIG, STATUS_CONFIG } from "../assets/constants/incidentStyles";
+import { PROGRESS_BAR_COLOR, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../assets/constants/incidentStyles";
 import { useIncidentEdit } from "../hooks/useIncidentEdit";
 import { EditableTitle, EditableDescription,EditableDueDate } from "./EditableFields";
 import { InlineSelect } from "./InlineSelect";
@@ -40,7 +40,7 @@ function SidebarField({ icon: Icon, label, children }) {
 export default function IncidentDetailsPage({ incident, onUpdated }) {
     const { draft, save } = useIncidentEdit(incident, onUpdated);
     const progress = incident.progress ?? 0;
-
+    console.log(draft);
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
             <div

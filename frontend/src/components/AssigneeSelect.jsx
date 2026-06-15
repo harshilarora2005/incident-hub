@@ -48,9 +48,10 @@ export default function AssigneeSelect({ value = [], onChange, single = false })
             autoHighlight
             items={users.map((u) => ({ label: u.name, value: String(u.id) }))}
             value={value.map(String)}
-            onValueChange={(vals) =>
-                onChange(single ? Number(vals[0]) : vals.map(Number))
-            }
+            onValueChange={(vals) =>{
+                console.log("NEW VALUES:", vals);
+                onChange(single ? Number(vals[0]) : vals.map(Number));
+            }}
         >
             <ComboboxChips ref={anchor} className="w-full min-h-8 text-[12px]">
                 <ComboboxValue>
@@ -78,7 +79,7 @@ export default function AssigneeSelect({ value = [], onChange, single = false })
                 </ComboboxValue>
             </ComboboxChips>
 
-            <ComboboxContent anchor={anchor}>
+            <ComboboxContent anchor={anchor} className="z-9999">
                 <ComboboxEmpty>No users found.</ComboboxEmpty>
                 <ComboboxList>
                     {(item) => {

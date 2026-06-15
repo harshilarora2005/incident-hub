@@ -5,12 +5,8 @@ import { IncidentCard } from "./IncidentCard";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
-import {
-    Dialog,
-    DialogContent,
-} from "@/components/ui/dialog";
+import Dialog from "@mui/material/Dialog";
 import IncidentDetailsPage from "./IncidentDetailsPage";
-
 function DraggableIncidentCard({ incident, index }) {
     const [open, setOpen] = useState(false);
 
@@ -37,11 +33,13 @@ function DraggableIncidentCard({ incident, index }) {
                     <div onClick={() => setOpen(true)}>
                         <IncidentCard incident={incident} />
                     </div>
-
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogContent className="min-w-4xl w-full p-0 overflow-hidden [&>button]:hidden">
-                            <IncidentDetailsPage incident={incident}  />
-                        </DialogContent>
+                    <Dialog
+                        open={open}
+                        onClose={() => setOpen(false)}
+                        maxWidth="lg"
+                        fullWidth
+                    >
+                        <IncidentDetailsPage incident={incident} />
                     </Dialog>
                 </div>
             )}
