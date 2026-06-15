@@ -16,6 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class IncidentService {
 
+    private final NotificationService notificationService;
     private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
     private final IncidentMapper incidentMapper;
@@ -33,7 +34,7 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), true))
                 .build();
-
+        notificationService.notifyAllUsers(reporter, incident);
         return incidentMapper.toDto(incidentRepository.save(incident));
     }
 
@@ -48,7 +49,7 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), false))
                 .build();
-
+        notificationService.notifyAllUsers(reporter, incident);
         return incidentMapper.toDto(incidentRepository.save(incident));
     }
 
