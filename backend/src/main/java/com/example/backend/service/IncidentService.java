@@ -34,7 +34,7 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), true))
                 .build();
-        notificationService.notifyAllUsers(reporter, incident);
+        notifyAssignees(incident,reporter);
         return incidentMapper.toDto(incidentRepository.save(incident));
     }
 
@@ -49,7 +49,7 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), false))
                 .build();
-        notificationService.notifyAllUsers(reporter, incident);
+        notifyAssignees(incident,reporter);
         return incidentMapper.toDto(incidentRepository.save(incident));
     }
 
@@ -106,6 +106,19 @@ public class IncidentService {
         return new HashSet<>(found);
     }
 
+    private void notifyAssignees(Incident incident, User sender) {
+        incident.getAssignees().forEach(assignee -> {
+            if (!assignee.getId().equals(sender.getId())) {
+                notificationService.send(
+                        "Assigned to incident",
+                        "You've been assigned to: " + incident.getTitle(),
+                        incident.getId(),
+                        assignee,
+                        sender
+                );
+            }
+        });
+    }
     private int progressFor(IncidentStatus status) {
         return switch (status) {
             case IN_PROGRESS -> 50;

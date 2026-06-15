@@ -1,15 +1,15 @@
 package com.example.backend.service;
 
 import com.example.backend.dtos.NotificationRecords.NotificationDTO;
-import com.example.backend.entity.Incident;
 import com.example.backend.entity.Notifications;
 import com.example.backend.entity.User;
+import com.example.backend.exception.CustomExceptionHandler;
+import com.example.backend.mappers.NotificationMapper;
 import com.example.backend.repository.NotificationRepository;
-import com.example.backend.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,46 +18,57 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate messagingTemplate;
-    private final UserRepository users;
-    private final NotificationRepository notifications;
+
+    @Transactional(readOnly = true)
+    public List<NotificationDTO> getForUser(Long recipientId) {
+        return notificationRepository
+                .findByRecipientIdOrderByCreatedAtDesc(recipientId)
+                .stream()
+                .map(notificationMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public long getUnreadCount(Long recipientId) {
+        return notificationRepository.countByRecipientIdAndIsReadFalse(recipientId);
+    }
 
     @Transactional
-    public void notifyAllUsers(User sender, Incident incident) {
-        List<User> recipients = users.findAll();
-        for (User recipient : recipients) {
-            Notifications notification =
-                    Notifications.builder()
-                            .title("New Incident")
-                            .message(
-                                    sender.getName()
-                                            + " created "
-                                            + incident.getTitle()
-                            )
-                            .sender(sender)
-                            .recipient(recipient)
-                            .incidentId(incident.getId())
-                            .createdAt(Instant.now())
-                            .isRead(false)
-                            .build();
-
-            notifications.save(notification);
-
-            NotificationDTO dto = new NotificationDTO(
-                    notification.getId(),
-                    notification.getTitle(),
-                    notification.getMessage(),
-                    incident.getId(),
-                    sender.getId(),
-                    sender.getName(),
-                    notification.isRead(),
-                    notification.getCreatedAt()
-            );
-
-            messagingTemplate.convertAndSend(
-                    "/topic/notifications",
-                    dto
-            );
+    public NotificationDTO markRead(Long notificationId, Long recipientId) {
+        Notifications notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CustomExceptionHandler("Notification not found"));
+        if (!notification.getRecipient().getId().equals(recipientId)) {
+            throw new CustomExceptionHandler("Not your notification");
         }
+        notification.setRead(true);
+        return notificationMapper.toDto(notificationRepository.save(notification));
+    }
+
+    @Transactional
+    public void markAllRead(Long recipientId) {
+        notificationRepository.markAllReadByRecipientId(recipientId);
+    }
+
+    @Transactional
+    public void send(String title, String message, Long incidentId, User recipient, User sender) {
+        Notifications notification = Notifications.builder()
+                .title(title)
+                .message(message)
+                .incidentId(incidentId)
+                .recipient(recipient)
+                .sender(sender)
+                .isRead(false)
+                .createdAt(Instant.now())
+                .build();
+
+        NotificationDTO dto = notificationMapper.toDto(notificationRepository.save(notification));
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(recipient.getId()),
+                "/queue/notifications",
+                dto
+        );
     }
 }
