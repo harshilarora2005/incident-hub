@@ -6,7 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { PRIORITY_LABELS, CATEGORY_LABELS } from "../assets/constants/incidentLables";
+import { PRIORITY_LABELS, CATEGORY_LABELS } from "../assets/constants/labels";
 import FormField from "./FormField";
 import { inputStyle } from "../assets/constants/formStyles";
 
