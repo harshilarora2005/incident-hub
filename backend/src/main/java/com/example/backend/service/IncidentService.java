@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class IncidentService {
 
+    private final AuditService auditService;
     private final NotificationService notificationService;
     private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
@@ -38,6 +39,8 @@ public class IncidentService {
                 .build();
 
         Incident saved = incidentRepository.save(incident);
+        auditService.log(saved.getId(), saved.getTitle(), reporter,
+                AuditAction.CREATED, null, saved.getTitle());
         notifyAssignees(saved, saved.getAssignees(), reporter);
         return incidentMapper.toDto(saved);
     }
@@ -55,36 +58,79 @@ public class IncidentService {
                 .build();
 
         Incident saved = incidentRepository.save(incident);
+        auditService.log(saved.getId(), saved.getTitle(), reporter,
+                AuditAction.CREATED, null, saved.getTitle());
         notifyAssignees(saved, saved.getAssignees(), reporter);
         return incidentMapper.toDto(saved);
     }
 
     @Transactional
-    public void updateStatus(Long incidentId, IncidentStatus newStatus) {
+    public void updateStatus(Long incidentId, IncidentStatus newStatus, User changedBy) {
         Incident incident = findIncidentById(incidentId);
+        String oldStatus = incident.getStatus().name();
         incident.setStatus(newStatus);
         incident.setProgress(progressFor(newStatus));
+        auditService.log(incidentId, incident.getTitle(), changedBy,
+                AuditAction.STATUS_CHANGED, oldStatus, newStatus.name());
     }
 
     @Transactional
     public IncidentDetails updateIncident(Long id, UpdateRequest request, User sender) {
         Incident incident = findIncidentById(id);
+        
+        if (request.title() != null && !request.title().equals(incident.getTitle())) {
+            auditService.log(id, incident.getTitle(), sender,
+                    AuditAction.TITLE_CHANGED, incident.getTitle(), request.title());
+        }
+        if (request.description() != null && !request.description().equals(incident.getDescription())) {
+            auditService.log(id, incident.getTitle(), sender,
+                    AuditAction.DESCRIPTION_CHANGED, null, null);
+        }
+        if (request.priority() != null && !request.priority().equals(incident.getPriority())) {
+            auditService.log(id, incident.getTitle(), sender,
+                    AuditAction.PRIORITY_CHANGED,
+                    incident.getPriority().name(), request.priority().name());
+        }
+        if (request.category() != null && !request.category().equals(incident.getCategory())) {
+            auditService.log(id, incident.getTitle(), sender,
+                    AuditAction.CATEGORY_CHANGED,
+                    incident.getCategory().name(), request.category().name());
+        }
+        if (request.dueAt() != null && !request.dueAt().equals(incident.getDueAt())) {
+            auditService.log(id, incident.getTitle(), sender,
+                    AuditAction.DUE_DATE_CHANGED,
+                    String.valueOf(incident.getDueAt()), String.valueOf(request.dueAt()));
+        }
 
-        Set<Long> existingAssigneeIds = incident.getAssignees().stream()
-                .map(User::getId)
-                .collect(Collectors.toSet());
-
+        Set<Long> existingIds = incident.getAssignees().stream()
+                .map(User::getId).collect(Collectors.toSet());
         Set<User> updatedAssignees = resolveAssignees(request.assigneesIds(), true);
+        Set<Long> updatedIds = updatedAssignees.stream()
+                .map(User::getId).collect(Collectors.toSet());
 
         List<User> newlyAssigned = updatedAssignees.stream()
-                .filter(u -> !existingAssigneeIds.contains(u.getId()))
-                .toList();
+                .filter(u -> !existingIds.contains(u.getId())).toList();
+        List<User> removed = incident.getAssignees().stream()
+                .filter(u -> !updatedIds.contains(u.getId())).toList();
+
+        newlyAssigned.forEach(u -> auditService.log(id, incident.getTitle(), sender,
+                AuditAction.ASSIGNEE_ADDED, null, u.getName()));
+        removed.forEach(u -> auditService.log(id, incident.getTitle(), sender,
+                AuditAction.ASSIGNEE_REMOVED, u.getName(), null));
 
         incident.setAssignees(updatedAssignees);
         incidentMapper.updateIncidentFromRequest(request, incident);
         notifyAssignees(incident, newlyAssigned, sender);
 
         return incidentMapper.toDto(incident);
+    }
+
+    @Transactional
+    public void deleteIncident(Long id, User deletedBy) {
+        Incident incident = findIncidentById(id);
+        auditService.log(id, incident.getTitle(), deletedBy,
+                AuditAction.DELETED, incident.getTitle(), null);
+        incident.setDeletedAt(Instant.now());
     }
 
     @Transactional(readOnly = true)
@@ -107,12 +153,6 @@ public class IncidentService {
                 .sorted(Comparator.comparing(Incident::getCreatedAt).reversed())
                 .map(incidentMapper::toDto)
                 .toList();
-    }
-
-    @Transactional
-    public void deleteIncident(Long id, User deletedBy) {
-        Incident incident = findIncidentById(id);
-        incident.setDeletedAt(Instant.now());
     }
 
     private Incident findIncidentById(Long id) {

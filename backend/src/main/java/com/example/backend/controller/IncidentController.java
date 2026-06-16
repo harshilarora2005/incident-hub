@@ -44,8 +44,8 @@ public class IncidentController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
-        incidentService.updateStatus(id, request.status());
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
+        incidentService.updateStatus(id, request.status(), userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
 
@@ -55,9 +55,7 @@ public class IncidentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteIncident(
-            @PathVariable Long id,
-            @AuthenticationPrincipal AppUserDetails userDetails) {
+    public ResponseEntity<Void> deleteIncident(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails userDetails) {
         incidentService.deleteIncident(id, userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
