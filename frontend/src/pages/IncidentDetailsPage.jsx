@@ -56,7 +56,6 @@ export default function IncidentDetailsPage({ incident, onUpdated }) {
             </div>
 
             <div className="flex flex-1 overflow-hidden">
-                {/* Left panel */}
                 <div
                     className="flex-1 overflow-y-auto px-6 py-5 space-y-6"
                     style={{ borderRight: "1px solid rgba(138,155,170,0.15)" }}
