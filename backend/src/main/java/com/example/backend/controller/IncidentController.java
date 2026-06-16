@@ -1,13 +1,12 @@
 package com.example.backend.controller;
 
-import com.example.backend.dtos.AuthRecords.AuthResponse;
 import com.example.backend.dtos.IncidentRecords.*;
-import com.example.backend.service.AuthService;
+import com.example.backend.dtos.AppUserDetails;
 import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,39 +15,42 @@ import java.util.List;
 @RequestMapping("/api/incidents")
 @RequiredArgsConstructor
 public class IncidentController {
-    private final IncidentService service;
-    private final CurrentUser user;
-    private final AuthService authService;
+
+    private final IncidentService incidentService;
 
     @GetMapping
-    public List<IncidentDetails> list(){
-        return service.findAll();
-    }
-    @PostMapping
-    public IncidentDetails create(@Valid @RequestBody CreateRequest req) {
-        return service.create(req,user.get());
-    }
-    @PostMapping("/quick")
-    public IncidentDetails createQuick(@Valid @RequestBody QuickCreateRequest req) {
-        return service.createQuick(req,user.get());
-    }
-    @GetMapping("/{id}")
-    public IncidentDetails findById(@PathVariable Long id){
-        return service.findById(id);
-    }
-    @GetMapping("/my")
-    public List<IncidentDetails> listMy(Authentication authentication){
-        AuthResponse au = authService.getCurrentUser(authentication);
-        return service.findAllForUser(au.userId());
-    }
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest req){
-        service.updateStatus(id,req.status());
-        return ResponseEntity.ok().build();
-    }
-    @PatchMapping("/{id}")
-    public ResponseEntity<IncidentDetails> updateIncident(@PathVariable Long id, @RequestBody UpdateRequest request) {
-        return ResponseEntity.ok(service.updateIncident(id, request));
+    public ResponseEntity<List<IncidentDetails>> list() {
+        return ResponseEntity.ok(incidentService.findAll());
     }
 
+    @PostMapping
+    public ResponseEntity<IncidentDetails> create(@Valid @RequestBody CreateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
+        return ResponseEntity.ok(incidentService.create(request, userDetails.getUser()));
+    }
+
+    @PostMapping("/quick")
+    public ResponseEntity<IncidentDetails> createQuick(@Valid @RequestBody QuickCreateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
+        return ResponseEntity.ok(incidentService.createQuick(request, userDetails.getUser()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<IncidentDetails> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(incidentService.findById(id));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<IncidentDetails>> listMy(@AuthenticationPrincipal AppUserDetails userDetails) {
+        return ResponseEntity.ok(incidentService.findAllForUser(userDetails.getId()));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+        incidentService.updateStatus(id, request.status());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<IncidentDetails> updateIncident(@PathVariable Long id, @RequestBody UpdateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
+        return ResponseEntity.ok(incidentService.updateIncident(id, request, userDetails.getUser()));
+    }
 }

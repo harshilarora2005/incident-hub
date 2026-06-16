@@ -6,11 +6,15 @@ import useAuth from "./useAuth";
 export function useNotifications() {
     const [notifications, setNotifications] = useState([]);
     const {user} = useAuth();
-    const userId = user?.id;
+    const userId = user?.userId;
+    console.log(user)
     useEffect(() => {
-        getNotifications().
-        then(setNotifications).
-        catch(console.error);
+        getNotifications()
+        .then((data) => {
+            console.log(data)
+            setNotifications(data ?? [])
+    })
+        .catch(console.error);
     }, []);
 
     useEffect(() => {

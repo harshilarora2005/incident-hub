@@ -24,11 +24,11 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<NotificationDTO> getForUser(Long recipientId) {
-        return notificationRepository
-                .findByRecipientIdOrderByCreatedAtDesc(recipientId)
-                .stream()
+        List<Notifications> le = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(recipientId);
+        List<NotificationDTO> li =  le.stream()
                 .map(notificationMapper::toDto)
                 .toList();
+        return li;
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +44,9 @@ public class NotificationService {
             throw new CustomExceptionHandler("Not your notification");
         }
         notification.setRead(true);
-        return notificationMapper.toDto(notificationRepository.save(notification));
+        notificationRepository.save(notification);
+        NotificationDTO notificationDTO = notificationMapper.toDto(notification);
+        return notificationDTO;
     }
 
     @Transactional

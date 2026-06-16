@@ -1,15 +1,18 @@
 import api from "./axios";
 
-export const getNotifications=()=> {
-    api.get("/notifications").then(r => r.data);
+export const getNotifications = async()=> {
+    const res = await api.get("/notifications");
+    return res.data;
 }
 
-export const getUnreadCount= ()=> {
-    api.get("/notifications/unread-count").then(r => r.data);
+export const getUnreadCount = async()=> {
+    const res = await api.get("/notifications/unread-count")
+    return res.data;
 }
 
-export const markRead=(id)=> {
-    api.patch(`/notifications/${id}/read`).then(r => r.data);
+export const markRead = async(id)=> {
+    const res = await api.patch(`/notifications/${id}/read`)
+    return res.data;
 }
 
 export const markAllRead=()=>{

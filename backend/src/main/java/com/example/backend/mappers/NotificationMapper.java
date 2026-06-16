@@ -9,5 +9,7 @@ public interface NotificationMapper {
 
     @Mapping(target = "senderName",source = "sender.name")
     @Mapping(target = "senderAvatar", source = "sender.avatarUrl")
+    @Mapping(target = "isRead",source = "read")
+    @Mapping(target = "incidentId",source = "incidentId")
     NotificationDTO toDto(Notifications notification);
 }

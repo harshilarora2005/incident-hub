@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +35,10 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), true))
                 .build();
-        notifyAssignees(incident,reporter);
-        return incidentMapper.toDto(incidentRepository.save(incident));
+
+        Incident saved = incidentRepository.save(incident);
+        notifyAssignees(saved, saved.getAssignees(), reporter);
+        return incidentMapper.toDto(saved);
     }
 
     @Transactional
@@ -49,8 +52,10 @@ public class IncidentService {
                 .reporter(reporter)
                 .assignees(resolveAssignees(request.assigneeIds(), false))
                 .build();
-        notifyAssignees(incident,reporter);
-        return incidentMapper.toDto(incidentRepository.save(incident));
+
+        Incident saved = incidentRepository.save(incident);
+        notifyAssignees(saved, saved.getAssignees(), reporter);
+        return incidentMapper.toDto(saved);
     }
 
     @Transactional
@@ -61,10 +66,23 @@ public class IncidentService {
     }
 
     @Transactional
-    public IncidentDetails updateIncident(Long id, UpdateRequest request) {
+    public IncidentDetails updateIncident(Long id, UpdateRequest request, User sender) {
         Incident incident = findIncidentById(id);
-        incident.setAssignees(resolveAssignees(request.assigneesIds(),true));
+
+        Set<Long> existingAssigneeIds = incident.getAssignees().stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+
+        Set<User> updatedAssignees = resolveAssignees(request.assigneesIds(), true);
+
+        List<User> newlyAssigned = updatedAssignees.stream()
+                .filter(u -> !existingAssigneeIds.contains(u.getId()))
+                .toList();
+
+        incident.setAssignees(updatedAssignees);
         incidentMapper.updateIncidentFromRequest(request, incident);
+        notifyAssignees(incident, newlyAssigned, sender);
+
         return incidentMapper.toDto(incident);
     }
 
@@ -90,6 +108,8 @@ public class IncidentService {
                 .toList();
     }
 
+    // --- helpers ---
+
     private Incident findIncidentById(Long id) {
         return incidentRepository.findById(id)
                 .orElseThrow(() -> new CustomExceptionHandler("Incident with id " + id + " not found"));
@@ -104,8 +124,8 @@ public class IncidentService {
         return new HashSet<>(found);
     }
 
-    private void notifyAssignees(Incident incident, User sender) {
-        incident.getAssignees().forEach(assignee -> {
+    private void notifyAssignees(Incident incident, Collection<User> assignees, User sender) {
+        assignees.forEach(assignee -> {
             if (!assignee.getId().equals(sender.getId())) {
                 notificationService.send(
                         "Assigned to incident",
@@ -117,12 +137,13 @@ public class IncidentService {
             }
         });
     }
+
     private int progressFor(IncidentStatus status) {
         return switch (status) {
             case IN_PROGRESS -> 50;
-            case REVIEW -> 90;
-            case RESOLVED -> 100;
-            default -> 0;
+            case REVIEW      -> 90;
+            case RESOLVED    -> 100;
+            default          -> 0;
         };
     }
 }
