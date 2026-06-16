@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,11 @@ public class IncidentService {
                 .toList();
     }
 
-    // --- helpers ---
+    @Transactional
+    public void deleteIncident(Long id, User deletedBy) {
+        Incident incident = findIncidentById(id);
+        incident.setDeletedAt(Instant.now());
+    }
 
     private Incident findIncidentById(Long id) {
         return incidentRepository.findById(id)

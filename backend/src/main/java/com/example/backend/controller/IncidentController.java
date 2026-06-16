@@ -53,4 +53,12 @@ public class IncidentController {
     public ResponseEntity<IncidentDetails> updateIncident(@PathVariable Long id, @RequestBody UpdateRequest request, @AuthenticationPrincipal AppUserDetails userDetails) {
         return ResponseEntity.ok(incidentService.updateIncident(id, request, userDetails.getUser()));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteIncident(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AppUserDetails userDetails) {
+        incidentService.deleteIncident(id, userDetails.getUser());
+        return ResponseEntity.noContent().build();
+    }
 }
