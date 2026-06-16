@@ -2,29 +2,22 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { DragDropContext } from "@hello-pangea/dnd";
 import { KanbanColumn } from "../components/KanbanColumn";
-import { getAllIncidents } from "../api/incidents";
+import { getAllIncidents, updateIncidentStatus } from "../api/incidents";
 import { useNavigate } from "react-router";
-import { updateIncidentStatus } from "../api/incidents";
 import { toast } from "sonner";
+
 const COLUMNS = [
     { key: "OPEN",label: "Open",dot: "#8A9BAA" },
-    { key: "IN_PROGRESS",label: "In Progress",dot: "#C4714A" },
+    { key: "IN_PROGRESS", label: "In Progress",dot: "#C4714A" },
     { key: "REVIEW",label: "Under Review",dot: "#E2A84B" },
     { key: "RESOLVED",label: "Resolved",dot: "#4CAF82" },
 ];
 
 export default function IncidentsPage() {
     const [incidents, setIncidents] = useState([]);
-    const [loading, setLoading]= useState(true);
-    const [error, setError]= useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const handleIncidentUpdated = (updated) => {
-        setIncidents(prev =>
-            prev.map(i =>
-                i.id === updated.id ? updated : i
-            )
-        );
-    };
 
     useEffect(() => {
         getAllIncidents()
@@ -34,26 +27,29 @@ export default function IncidentsPage() {
     }, []);
 
     const byStatus = (status) => incidents.filter((i) => i.status === status);
-    const handleQuickCreated = (incident)=>setIncidents((prev) => [incident, ...prev]);
+
+    const handleQuickCreated = (incident) =>
+        setIncidents((prev) => [incident, ...prev]);
+
+    const handleUpdated = (updated) =>
+        setIncidents((prev) => prev.map((i) => i.id === updated.id ? updated : i));
+
+    const handleDeleted = (id) =>
+        setIncidents((prev) => prev.filter((i) => i.id !== id));
 
     const onDragEnd = async ({ source, destination, draggableId }) => {
         if (!destination) return;
-        if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-        ) return;
+        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
         const newStatus = destination.droppableId;
         const id = Number(draggableId);
         setIncidents((prev) =>
             prev.map((inc) => inc.id === id ? { ...inc, status: newStatus } : inc)
         );
         try {
-            console.log(id,newStatus)
             await updateIncidentStatus(id, newStatus);
         } catch {
-            const oldStatus = source.droppableId;
             setIncidents((prev) =>
-                prev.map((inc) => inc.id === id ? { ...inc, status: oldStatus } : inc)
+                prev.map((inc) => inc.id === id ? { ...inc, status: source.droppableId } : inc)
             );
             toast.error("Failed to update status");
         }
@@ -92,7 +88,8 @@ export default function IncidentsPage() {
                             column={col}
                             incidents={byStatus(col.key)}
                             onQuickCreated={handleQuickCreated}
-                            onUpdated={handleIncidentUpdated}
+                            onUpdated={handleUpdated}
+                            onDeleted={handleDeleted}
                         />
                     ))}
                 </div>

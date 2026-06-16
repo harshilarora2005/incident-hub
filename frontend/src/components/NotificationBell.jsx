@@ -8,7 +8,6 @@ import { useNotifications } from "../hooks/useNotifications";
 
 export function NotificationBell() {
     const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
-
     return (
         <Popover>
             <PopoverTrigger>
@@ -26,7 +25,6 @@ export function NotificationBell() {
             </PopoverTrigger>
 
             <PopoverContent align="end" className="w-80 p-0 overflow-hidden rounded-xl shadow-lg">
-                {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3" style={{ background: "#FAFAF7" }}>
                     <p className="text-[13px] font-semibold" style={{ color: "#111D28" }}>
                         Notifications
@@ -49,8 +47,7 @@ export function NotificationBell() {
 
                 <Separator style={{ background: "rgba(138,155,170,0.15)" }} />
 
-                {/* List */}
-                <ScrollArea className="max-h-[360px]">
+                <ScrollArea className="max-h-90">
                     {notifications.length === 0 ? (
                         <div className="py-10 text-center">
                             <Bell size={20} className="mx-auto mb-2 opacity-20" />

@@ -1,21 +1,19 @@
 import { useState } from "react";
-import { Plus, MoreHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { IncidentCard } from "./IncidentCard";
+import { IncidentCardMenu } from "./IncidentCardMenu.jsx";
 import { QuickCreateCard } from "./QuickCreateCard";
 import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
 import Dialog from "@mui/material/Dialog";
 import IncidentDetailsPage from "../pages/IncidentDetailsPage";
-function DraggableIncidentCard({ incident, index, onUpdated}) {
+
+function DraggableIncidentCard({ incident, index, onUpdated, onDeleted }) {
     const [open, setOpen] = useState(false);
 
     return (
-        <Draggable
-            key={incident.id}
-            draggableId={String(incident.id)}
-            index={index}
-        >
+        <Draggable draggableId={String(incident.id)} index={index}>
             {(provided, snapshot) => (
                 <div
                     ref={provided.innerRef}
@@ -30,17 +28,34 @@ function DraggableIncidentCard({ incident, index, onUpdated}) {
                             : "none",
                     }}
                 >
-                    <div onClick={() => setOpen(true)}>
-                        <IncidentCard incident={incident} />
+                    <div className="relative group">
+                        <div onClick={() => setOpen(true)}>
+                            <IncidentCard incident={incident} />
+                        </div>
+                        <div
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <IncidentCardMenu
+                                incidentId={incident.id}
+                                onDeleted={(id) => {
+                                    setOpen(false);
+                                    onDeleted(id);
+                                }}
+                            />
+                        </div>
                     </div>
+
                     <Dialog
                         open={open}
                         onClose={() => setOpen(false)}
                         maxWidth="lg"
                         fullWidth
                     >
-                        <IncidentDetailsPage incident={incident}
-                        onUpdated={onUpdated} />
+                        <IncidentDetailsPage
+                            incident={incident}
+                            onUpdated={onUpdated}
+                        />
                     </Dialog>
                 </div>
             )}
@@ -48,7 +63,7 @@ function DraggableIncidentCard({ incident, index, onUpdated}) {
     );
 }
 
-export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
+export function KanbanColumn({ column, incidents, onQuickCreated, onUpdated, onDeleted }) {
     const [isCreating, setIsCreating] = useState(false);
     const isResolved = column.key === "RESOLVED";
 
@@ -74,18 +89,12 @@ export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
         <div className="flex flex-col min-w-0">
             <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2">
-                    <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ background: column.dot }}
-                    />
-                    <span className="text-[13px] font-medium text-[#111D28]">
-                        {column.label}
-                    </span>
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: column.dot }} />
+                    <span className="text-[13px] font-medium text-[#111D28]">{column.label}</span>
                     <span className="text-[12px] text-[#8A9BAA] bg-[rgba(138,155,170,0.15)] px-2 py-0.5 rounded-full">
                         {incidents.length}
                     </span>
                 </div>
-                <MoreHorizontal size={16} className="text-[#8A9BAA] cursor-pointer" />
             </div>
 
             <Droppable droppableId={column.key}>
@@ -96,9 +105,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
                         className="space-y-2 transition-colors rounded-xl"
                         style={{
                             minHeight: 40,
-                            background: snapshot.isDraggingOver
-                                ? "rgba(196,113,74,0.06)"
-                                : "transparent",
+                            background: snapshot.isDraggingOver ? "rgba(196,113,74,0.06)" : "transparent",
                             padding: snapshot.isDraggingOver ? "6px" : "0",
                         }}
                     >
@@ -108,6 +115,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
                                 incident={incident}
                                 index={index}
                                 onUpdated={onUpdated}
+                                onDeleted={onDeleted}
                             />
                         ))}
                         {provided.placeholder}
@@ -118,10 +126,7 @@ export function KanbanColumn({ column, incidents, onQuickCreated , onUpdated}) {
             {!isResolved && (
                 <div className="mt-2">
                     {isCreating ? (
-                        <QuickCreateCard
-                            onSave={handleSave}
-                            onCancel={() => setIsCreating(false)}
-                        />
+                        <QuickCreateCard onSave={handleSave} onCancel={() => setIsCreating(false)} />
                     ) : (
                         <button
                             onClick={() => setIsCreating(true)}

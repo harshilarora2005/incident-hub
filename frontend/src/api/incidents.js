@@ -29,3 +29,7 @@ export const updateIncident = async(id,payload)=>{
     const response = await await api.patch(`/incidents/${id}`, payload);
     return response.data;
 }
+
+export const deleteIncident = async(id) =>{
+    await api.delete(`/incidents/${id}`);
+} 
