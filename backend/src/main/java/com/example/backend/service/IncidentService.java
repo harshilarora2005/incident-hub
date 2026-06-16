@@ -77,7 +77,7 @@ public class IncidentService {
     @Transactional
     public IncidentDetails updateIncident(Long id, UpdateRequest request, User sender) {
         Incident incident = findIncidentById(id);
-        
+
         if (request.title() != null && !request.title().equals(incident.getTitle())) {
             auditService.log(id, incident.getTitle(), sender,
                     AuditAction.TITLE_CHANGED, incident.getTitle(), request.title());
