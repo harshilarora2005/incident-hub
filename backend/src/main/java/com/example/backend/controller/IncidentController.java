@@ -6,6 +6,7 @@ import com.example.backend.service.IncidentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,6 +55,7 @@ public class IncidentController {
         return ResponseEntity.ok(incidentService.updateIncident(id, request, userDetails.getUser()));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIncident(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails userDetails) {
         incidentService.deleteIncident(id, userDetails.getUser());

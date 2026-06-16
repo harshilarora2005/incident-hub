@@ -8,10 +8,11 @@ import { createQuick } from "../api/incidents";
 import { toast } from "sonner";
 import Dialog from "@mui/material/Dialog";
 import IncidentDetailsPage from "../pages/IncidentDetailsPage";
+import { useRole } from "../hooks/useRole.js";
 
 function DraggableIncidentCard({ incident, index, onUpdated, onDeleted }) {
     const [open, setOpen] = useState(false);
-
+    const {isAdmin, isManager} = useRole();
     return (
         <Draggable draggableId={String(incident.id)} index={index}>
             {(provided, snapshot) => (
@@ -36,13 +37,15 @@ function DraggableIncidentCard({ incident, index, onUpdated, onDeleted }) {
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <IncidentCardMenu
-                                incidentId={incident.id}
-                                onDeleted={(id) => {
-                                    setOpen(false);
-                                    onDeleted(id);
-                                }}
-                            />
+                            {(isManager || isAdmin) &&
+                                <IncidentCardMenu
+                                    incidentId={incident.id}
+                                    onDeleted={(id) => {
+                                        setOpen(false);
+                                        onDeleted(id);
+                                    }}
+                                />
+                            }
                         </div>
                     </div>
 
@@ -66,7 +69,6 @@ function DraggableIncidentCard({ incident, index, onUpdated, onDeleted }) {
 export function KanbanColumn({ column, incidents, onQuickCreated, onUpdated, onDeleted }) {
     const [isCreating, setIsCreating] = useState(false);
     const isResolved = column.key === "RESOLVED";
-
     const handleSave = async (form) => {
         const payload = {
             title: form.title,

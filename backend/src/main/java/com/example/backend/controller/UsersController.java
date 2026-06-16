@@ -23,7 +23,7 @@ import java.util.List;
 public class UsersController {
     private final UserService userService;
     private final AuthService authService;
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @PatchMapping("/{id}/role")
     public ResponseEntity<Void> updateRole(@PathVariable Long id, @RequestParam Role role) {
         userService.updateRole(id, role);
