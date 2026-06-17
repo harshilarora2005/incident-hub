@@ -21,7 +21,7 @@ public class UploadController {
                     file.getBytes(),
                     ObjectUtils.asMap(
                             "folder", "incident-management/attachments",
-                            "resource_type", "auto" 
+                            "resource_type", "auto"
                     )
             );
             String url= result.get("secure_url").toString();

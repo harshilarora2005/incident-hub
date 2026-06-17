@@ -11,6 +11,7 @@ import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.backend.dtos.CommentRecords.*;
@@ -24,6 +25,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final IncidentRepository incidentRepository;
     private final CommentMapper commentMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional(readOnly = true)
     public List<CommentRecords.CommentResponse> getComments(Long incidentId) {
@@ -45,8 +47,12 @@ public class CommentService {
                 .attachmentUrl(request.attachmentUrl())
                 .attachmentName(request.attachmentName())
                 .build();
-
-        return commentMapper.toDto(commentRepository.save(comment));
+        CommentResponse response = commentMapper.toDto(commentRepository.save(comment));
+        messagingTemplate.convertAndSend(
+                "/topic/incidents/" + incidentId + "/comments",
+                response
+        );
+        return response;
     }
 
     private Incident findIncident(Long incidentId) {
