@@ -27,5 +27,5 @@ public class CommentController {
                                                   @AuthenticationPrincipal AppUserDetails userDetails) {
         return ResponseEntity.ok(commentService.addComment(incidentId, request, userDetails.getUser()));
     }
-    
+
 }
