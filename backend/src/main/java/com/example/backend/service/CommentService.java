@@ -48,7 +48,7 @@ public class CommentService {
 
         return commentMapper.toDto(commentRepository.save(comment));
     }
-    
+
     private Incident findIncident(Long incidentId) {
         return incidentRepository.findById(incidentId)
                 .orElseThrow(() -> new CustomExceptionHandler("Incident not found: " + incidentId));
