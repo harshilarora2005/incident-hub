@@ -60,12 +60,16 @@ public class CommentService {
         if (!comment.getAuthor().getId().equals(currentUser.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only edit your own comments");
         }
-
         comment.setContent(request.content());
         if (request.attachmentUrl() != null) comment.setAttachmentUrl(request.attachmentUrl());
         if (request.attachmentName() != null) comment.setAttachmentName(request.attachmentName());
 
-        return commentMapper.toDto(commentRepository.save(comment));
+        CommentResponse response = commentMapper.toDto(commentRepository.save(comment));;
+        messagingTemplate.convertAndSend(
+                "/topic/incidents/" + incidentId + "/comments/edit",
+                response
+        );
+        return response;
     }
     @Transactional
     public void deleteComment(Long incidentId, Long commentId, User currentUser) {
@@ -77,7 +81,10 @@ public class CommentService {
         if (!isAuthor && !isAdmin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to delete this comment");
         }
-
+        messagingTemplate.convertAndSend(
+                "/topic/incidents/" + incidentId + "/comments/delete",
+                commentId
+        );
         commentRepository.delete(comment);
     }
 
