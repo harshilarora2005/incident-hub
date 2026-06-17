@@ -54,10 +54,44 @@ public class CommentService {
         );
         return response;
     }
+    @Transactional
+    public CommentResponse editComment(Long incidentId, Long commentId, CommentRequest request, User currentUser) {
+        Comment comment = findComment(commentId, incidentId);
+        if (!comment.getAuthor().getId().equals(currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only edit your own comments");
+        }
+
+        comment.setContent(request.content());
+        if (request.attachmentUrl() != null) comment.setAttachmentUrl(request.attachmentUrl());
+        if (request.attachmentName() != null) comment.setAttachmentName(request.attachmentName());
+
+        return commentMapper.toDto(commentRepository.save(comment));
+    }
+    @Transactional
+    public void deleteComment(Long incidentId, Long commentId, User currentUser) {
+        Comment comment = findComment(commentId, incidentId);
+
+        boolean isAuthor = comment.getAuthor().getId().equals(currentUser.getId());
+        boolean isAdmin  = currentUser.getRoles().contains(Role.ADMIN);
+
+        if (!isAuthor && !isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to delete this comment");
+        }
+
+        commentRepository.delete(comment);
+    }
 
     private Incident findIncident(Long incidentId) {
         return incidentRepository.findById(incidentId)
                 .orElseThrow(() -> new CustomExceptionHandler("Incident not found: " + incidentId));
+    }
+    private Comment findComment(Long commentId, Long incidentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomExceptionHandler("Comment not found: " + commentId));
+        if (!comment.getIncident().getId().equals(incidentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Comment does not belong to this incident");
+        }
+        return comment;
     }
     private void assertCanComment(Incident incident, User user) {
         boolean isAssignee = incident.getAssignees().stream()
