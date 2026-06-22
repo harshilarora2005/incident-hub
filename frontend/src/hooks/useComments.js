@@ -1,80 +1,120 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
-import {getComments,addComment,edit,deleteComment} from "../api/comments";
+import { getComments, addComment, editComment, deleteComment, uploadAttachment } from "../api/commentApi";
+import { toast } from "sonner";
+
 export function useComments(incidentId) {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
-    const fetchComments = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getComments(incidentId);
-            setComments(data);
-            setError(null);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
+    useEffect(() => {
+        setLoading(true);
+        getComments(incidentId)
+            .then((data) => setComments(data ?? []))
+            .catch(() => toast.error("Failed to load comments"))
+            .finally(() => setLoading(false));
     }, [incidentId]);
 
-    const createComment = async (payload) => {
-        return await addComment(incidentId, payload);
-    };
-
-    const updateComment = async (commentId, payload) => {
-        const updated = await edit(incidentId, commentId, payload);
-
-        setComments((prev) =>
-        prev.map((comment) =>
-            comment.id === commentId ? updated : comment
-        )
-        );
-
-        return updated;
-    };
-
-    const removeComment = async (commentId) => {
-        await deleteComment(incidentId, commentId);
-
-        setComments((prev) =>
-        prev.filter((comment) => comment.id !== commentId)
-        );
-    };
-
     useEffect(() => {
-        if (!incidentId) return;
-        fetchComments();
-    }, [incidentId, fetchComments]);
-
-    useEffect(() => {
-        if (!incidentId) return;
         const client = new Client({
             brokerURL: "ws://localhost:8080/ws",
-            onConnect: ()=>{
-                client.subscribe(
-                    `/topic/incidents/${incidentId}/comments`,
-                    (message) => {
-                    const comment = JSON.parse(message.body);
-                    setComments((prev) => {const exists = prev.some((c) => c.id === comment.id);
-                        if (exists) return prev;
-                        return [...prev, comment];
-                    })
-                })
-            }
+            reconnectDelay: 5000,
+            onConnect: () => {
+                client.subscribe(`/topic/incidents/${incidentId}/comments`, (msg) => {
+                    const { type, comment } = JSON.parse(msg.body);
+                    setComments((prev) => {
+                        if (type === "CREATED") {
+                            if (prev.find((c) => c.id === comment.id)) return prev;
+                            return [...prev, comment];
+                        }
+                        if (type === "UPDATED") {
+                            return prev.map((c) => (c.id === comment.id ? comment : c));
+                        }
+                        if (type === "DELETED") {
+                            return prev.filter((c) => c.id !== comment.id);
+                        }
+                        return prev;
+                    });
+                });
+            },
         });
         client.activate();
-        return () => {client.deactivate();};
+        return () => client.deactivate();
     }, [incidentId]);
 
-    return {
-        comments,
-        loading,
-        error,
-        refetch: fetchComments,
-        createComment,
-        updateComment,
-        removeComment,
-    };
+    const submitComment = useCallback(
+        async ({ content, file }) => {
+            let attachmentUrl = null;
+            let attachmentName = null;
+
+            if (file) {
+                try {
+                    const uploaded = await uploadAttachment(file);
+                    attachmentUrl = uploaded.url;
+                    attachmentName = uploaded.originalName;
+                } catch {
+                    toast.error("Failed to upload attachment");
+                    return;
+                }
+            }
+
+            try {
+                const created = await addComment(incidentId, {
+                    content,
+                    attachmentUrl,
+                    attachmentName,
+                });
+                setComments((prev) => [...prev, created]);
+            } catch {
+                toast.error("Failed to post comment");
+            }
+        },
+        [incidentId]
+    );
+
+    const updateComment = useCallback(
+        async (commentId, { content, file, existingAttachmentUrl, existingAttachmentName }) => {
+            let attachmentUrl = existingAttachmentUrl ?? null;
+            let attachmentName = existingAttachmentName ?? null;
+
+            if (file) {
+                try {
+                    const uploaded = await uploadAttachment(file);
+                    attachmentUrl = uploaded.url;
+                    attachmentName = uploaded.originalName;
+                } catch {
+                    toast.error("Failed to upload attachment");
+                    return;
+                }
+            }
+
+            try {
+                const updated = await editComment(incidentId, commentId, {
+                    content,
+                    attachmentUrl,
+                    attachmentName,
+                });
+                setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)));
+                toast.success("Comment updated");
+            } catch {
+                toast.error("Failed to update comment");
+            }
+        },
+        [incidentId]
+    );
+
+    const removeComment = useCallback(
+        async (commentId) => {
+            try {
+                await deleteComment(incidentId, commentId);
+                setComments((prev) => prev.filter((c) => c.id !== commentId));
+                toast.success("Comment deleted");
+            } catch {
+                toast.error("Failed to delete comment");
+            }
+        },
+        [incidentId]
+    );
+
+    return { comments, loading, submitComment, updateComment, removeComment };
 }
