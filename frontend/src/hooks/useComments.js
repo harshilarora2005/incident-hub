@@ -50,7 +50,6 @@ export function useComments(incidentId) {
 
     useEffect(() => {
         if (!incidentId) return;
-
         const client = new Client({
             brokerURL: "ws://localhost:8080/ws",
             onConnect: ()=>{
