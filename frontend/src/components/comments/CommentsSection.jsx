@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CommentCard } from "./CommentCard";
 import { CommentForm } from "./CommentForm";
