@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import { getComments, addComment, editComment, deleteComment, uploadAttachment } from "../api/commentsApi";

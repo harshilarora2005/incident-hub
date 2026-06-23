@@ -40,7 +40,6 @@ function SidebarField({ icon: Icon, label, children }) {
 export default function IncidentDetailsPage({ incident, onUpdated }) {
     const { draft, save } = useIncidentEdit(incident, onUpdated);
     const progress = incident.progress ?? 0;
-    console.log(incident)
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
             <div
