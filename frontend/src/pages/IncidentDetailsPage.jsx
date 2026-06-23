@@ -8,7 +8,7 @@ import { useIncidentEdit } from "../hooks/useIncidentEdit";
 import { EditableTitle, EditableDescription,EditableDueDate } from "../components/EditableFields";
 import { InlineSelect } from "../components/InlineSelect";
 import AssigneeSelect from "../components/AssigneeSelect";
-
+import { CommentsSection } from "../components/comments/CommentsSection";
 const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -92,6 +92,8 @@ export default function IncidentDetailsPage({ incident, onUpdated }) {
                         {incident.resolvedAt && (
                             <TimelineEvent label="Resolved" date={formatDate(incident.resolvedAt)} dot="#22c55e" />
                         )}
+                        <Separator style={{ background: "rgba(138,155,170,0.15)" }} />
+                        <CommentsSection incidentId={incident.id} />
                     </div>
                 </div>
                 <div className="w-55 shrink-0 overflow-y-auto px-5 py-5 space-y-5" style={{ background: "#FAFAF7" }}>

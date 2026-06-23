@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
-import { getComments, addComment, editComment, deleteComment, uploadAttachment } from "../api/commentApi";
+import { getComments, addComment, editComment, deleteComment, uploadAttachment } from "../api/commentsApi";
 import { toast } from "sonner";
 
 export function useComments(incidentId) {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         setLoading(true);
         getComments(incidentId)
