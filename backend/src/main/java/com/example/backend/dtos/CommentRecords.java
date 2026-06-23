@@ -21,4 +21,5 @@ public class CommentRecords {
             Instant createdAt,
             Instant updatedAt
     ) {}
+    public record CommentEvent(String type, CommentResponse comment) {}
 }

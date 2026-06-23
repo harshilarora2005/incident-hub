@@ -23,7 +23,7 @@ public final class MentionUtils {
         if (content == null) return "";
         return MENTION_PATTERN.matcher(content).replaceAll("@$2");
     }
-    
+
     public static String mentionToken(Long userId, String displayName) {
         return "@[" + userId + ":" + displayName + "]";
     }
