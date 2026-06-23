@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dtos.CommentRecords;
 import com.example.backend.dtos.NotificationRecords.NotificationDTO;
 import com.example.backend.entity.Notifications;
 import com.example.backend.entity.User;
@@ -10,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.example.backend.dtos.CommentRecords.CommentResponse;
 import java.time.Instant;
 import java.util.List;
 
@@ -25,10 +26,9 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationDTO> getForUser(Long recipientId) {
         List<Notifications> le = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(recipientId);
-        List<NotificationDTO> li =  le.stream()
+        return le.stream()
                 .map(notificationMapper::toDto)
                 .toList();
-        return li;
     }
 
     @Transactional(readOnly = true)
@@ -45,8 +45,7 @@ public class NotificationService {
         }
         notification.setRead(true);
         notificationRepository.save(notification);
-        NotificationDTO notificationDTO = notificationMapper.toDto(notification);
-        return notificationDTO;
+        return notificationMapper.toDto(notification);
     }
 
     @Transactional
@@ -54,6 +53,12 @@ public class NotificationService {
         notificationRepository.markAllReadByRecipientId(recipientId);
     }
 
+    public void broadcast(Long incidentId, String type, CommentResponse comment) {
+        messagingTemplate.convertAndSend(
+                "/topic/incidents/" + incidentId + "/comments",
+                new CommentRecords.CommentEvent(type, comment)
+        );
+    }
     @Transactional
     public void send(String title, String message, Long incidentId, User recipient, User sender) {
         Notifications notification = Notifications.builder()

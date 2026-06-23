@@ -7,11 +7,9 @@ export function useNotifications() {
     const [notifications, setNotifications] = useState([]);
     const {user} = useAuth();
     const userId = user?.userId;
-    console.log(user)
     useEffect(() => {
         getNotifications()
         .then((data) => {
-            console.log(data)
             setNotifications(data ?? [])
     })
         .catch(console.error);
