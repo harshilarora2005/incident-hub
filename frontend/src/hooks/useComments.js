@@ -45,7 +45,6 @@ export function useComments(incidentId) {
         async ({ content, file }) => {
             let attachmentUrl = null;
             let attachmentName = null;
-
             if (file) {
                 try {
                     const uploaded = await uploadAttachment(file);

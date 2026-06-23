@@ -40,6 +40,7 @@ function SidebarField({ icon: Icon, label, children }) {
 export default function IncidentDetailsPage({ incident, onUpdated }) {
     const { draft, save } = useIncidentEdit(incident, onUpdated);
     const progress = incident.progress ?? 0;
+    console.log(incident)
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
             <div
@@ -93,7 +94,7 @@ export default function IncidentDetailsPage({ incident, onUpdated }) {
                             <TimelineEvent label="Resolved" date={formatDate(incident.resolvedAt)} dot="#22c55e" />
                         )}
                         <Separator style={{ background: "rgba(138,155,170,0.15)" }} />
-                        <CommentsSection incidentId={incident.id} />
+                        <CommentsSection incidentId={incident.id} reporter={incident.reporter.id} assignees={incident.assignees?.map((a) => a.id) ?? []}/>
                     </div>
                 </div>
                 <div className="w-55 shrink-0 overflow-y-auto px-5 py-5 space-y-5" style={{ background: "#FAFAF7" }}>

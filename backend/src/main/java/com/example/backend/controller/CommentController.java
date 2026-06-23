@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dtos.AppUserDetails;
+import com.example.backend.entity.Role;
 import com.example.backend.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,4 @@ public class CommentController {
         commentService.deleteComment(incidentId, commentId, userDetails.getUser());
         return ResponseEntity.noContent().build();
     }
-
 }

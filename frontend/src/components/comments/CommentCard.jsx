@@ -16,7 +16,7 @@ import { CommentForm } from "./CommentForm";
 import useAuth from "../../hooks/useAuth";
 import { useRole } from "../../hooks/useRole";
 
-export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
+export function CommentCard({ comment, onUpdate, onDelete }) {
     const { user } = useAuth();
     const { isAdmin } = useRole();
     const [editing, setEditing] = useState(false);
@@ -53,7 +53,6 @@ export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
                 </Avatar>
 
                 <div className="flex-1 min-w-0">
-                    {/* Header row */}
                     <div className="flex items-center justify-between gap-2 mb-1">
                         <div className="flex items-center gap-2">
                             <span className="text-[13px] font-medium" style={{ color: "#111D28" }}>
@@ -68,8 +67,6 @@ export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
                                 </span>
                             )}
                         </div>
-
-                        {/* Action buttons — visible on hover */}
                         {!editing && (canEdit || canDelete) && (
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {canEdit && (
@@ -93,8 +90,6 @@ export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
                             </div>
                         )}
                     </div>
-
-                    {/* Content or edit form */}
                     {editing ? (
                         <CommentForm
                             initialContent={comment.content}
@@ -107,8 +102,6 @@ export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
                             <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: "#374151" }}>
                                 {comment.content}
                             </p>
-
-                            {/* Attachment */}
                             {comment.attachmentUrl && (
                                 <a
                                     href={comment.attachmentUrl}
@@ -127,7 +120,6 @@ export function CommentCard({ comment, incidentId, onUpdate, onDelete }) {
                 </div>
             </div>
 
-            {/* Delete confirm */}
             <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

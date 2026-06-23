@@ -10,7 +10,6 @@ export function useNotifications() {
     useEffect(() => {
         getNotifications()
         .then((data) => {
-            console.log(data)
             setNotifications(data ?? [])
     })
         .catch(console.error);

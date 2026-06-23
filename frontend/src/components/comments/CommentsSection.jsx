@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CommentCard } from "./CommentCard";
 import { CommentForm } from "./CommentForm";
 import { useComments } from "../../hooks/useComments"
-
+import { useCanComment } from "../../hooks/useCanComment";
 function CommentsSkeleton() {
     return (
         <div className="space-y-4 py-2">
@@ -23,9 +23,10 @@ function CommentsSkeleton() {
     );
 }
 
-export function CommentsSection({ incidentId }) {
+export function CommentsSection({ incidentId, reporter, assignees}) {
     const { comments, loading, submitComment, updateComment, removeComment } = useComments(incidentId);
     const bottomRef = useRef(null);
+    const canComment = useCanComment(reporter,assignees);
     useEffect(() => {
         if (!loading) {
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,8 +52,6 @@ export function CommentsSection({ incidentId }) {
                     </span>
                 )}
             </div>
-
-            {/* Comment list */}
             {loading ? (
                 <CommentsSkeleton />
             ) : comments.length === 0 ? (
@@ -69,7 +68,6 @@ export function CommentsSection({ incidentId }) {
                             <CommentCard
                                 key={comment.id}
                                 comment={comment}
-                                incidentId={incidentId}
                                 onUpdate={updateComment}
                                 onDelete={removeComment}
                             />
@@ -78,9 +76,9 @@ export function CommentsSection({ incidentId }) {
                     </div>
                 </ScrollArea>
             )}
-
-            {/* New comment form */}
-            <CommentForm onSubmit={submitComment} />
+            {canComment &&
+            <CommentForm onSubmit={submitComment}/>}
+            
         </div>
     );
 }
