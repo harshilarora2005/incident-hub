@@ -24,25 +24,13 @@ public class MentionableController {
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getMentionables(@PathVariable Long incidentId) {
-        Incident incident = incidentRepository.findById(incidentId)
+        Incident incident = incidentRepository.findByIdWithReporterAndAssignees(incidentId)
                 .orElseThrow(() -> new CustomExceptionHandler("Incident not found: " + incidentId));
 
-        List<UserDTO> users = new ArrayList<>();
-        users.add(userMapper.toDto(incident.getReporter()));
-        incident.getAssignees().stream()
-                .map(userMapper::toDto)
-                .forEach(users::add);
-
-        List<UserDTO> distinct = users.stream()
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toMap(
-                                UserDTO::getId,
-                                u -> u,
-                                (a, b) -> a,
-                                LinkedHashMap::new
-                        ),
-                        m -> new ArrayList<>(m.values())
-                ));
+        List<UserDTO> distinct = new ArrayList<>(new LinkedHashMap<Long, UserDTO>() {{
+            put(incident.getReporter().getId(), userMapper.toDto(incident.getReporter()));
+            incident.getAssignees().forEach(a -> putIfAbsent(a.getId(), userMapper.toDto(a)));
+        }}.values());
 
         return ResponseEntity.ok(distinct);
     }

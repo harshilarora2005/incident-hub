@@ -3,27 +3,23 @@ import { formatDistanceToNow } from "date-fns";
 import { Pencil, Trash2, Paperclip, Download } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent, AlertDialogDescription,
+    AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { CommentForm } from "./CommentForm";
+import { MentionText } from "./MentionText";
 import useAuth from "../../hooks/useAuth";
 import { useRole } from "../../hooks/useRole";
 
-export function CommentCard({ comment, onUpdate, onDelete }) {
+export function CommentCard({ comment, onUpdate, onDelete, mentionableUsers = [] }) {
     const { user } = useAuth();
     const { isAdmin } = useRole();
-    const [editing, setEditing] = useState(false);
+    const [editing, setEditing]           = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const isAuthor = user?.userId === comment.authorId;
-    const canEdit = isAuthor;
+    const canEdit   = isAuthor;
     const canDelete = isAuthor || isAdmin;
 
     const initials = (comment.authorName ?? "?")
@@ -33,7 +29,7 @@ export function CommentCard({ comment, onUpdate, onDelete }) {
         await onUpdate(comment.id, {
             content,
             file,
-            existingAttachmentUrl: comment.attachmentUrl,
+            existingAttachmentUrl:  comment.attachmentUrl,
             existingAttachmentName: comment.attachmentName,
         });
         setEditing(false);
@@ -53,6 +49,7 @@ export function CommentCard({ comment, onUpdate, onDelete }) {
                 </Avatar>
 
                 <div className="flex-1 min-w-0">
+                    {/* Header */}
                     <div className="flex items-center justify-between gap-2 mb-1">
                         <div className="flex items-center gap-2">
                             <span className="text-[13px] font-medium" style={{ color: "#111D28" }}>
@@ -67,6 +64,7 @@ export function CommentCard({ comment, onUpdate, onDelete }) {
                                 </span>
                             )}
                         </div>
+
                         {!editing && (canEdit || canDelete) && (
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {canEdit && (
@@ -90,28 +88,34 @@ export function CommentCard({ comment, onUpdate, onDelete }) {
                             </div>
                         )}
                     </div>
+
+                    {/* Body */}
                     {editing ? (
                         <CommentForm
                             initialContent={comment.content}
                             submitLabel="Save"
                             onSubmit={handleUpdate}
                             onCancel={() => setEditing(false)}
+                            mentionableUsers={mentionableUsers}
                         />
                     ) : (
                         <>
                             <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: "#374151" }}>
-                                {comment.content}
+                                <MentionText content={comment.content} />
                             </p>
+
                             {comment.attachmentUrl && (
                                 <a
                                     href={comment.attachmentUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-lg text-[12px] font-medium transition-colors hover:opacity-80"
+                                    className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-lg text-[12px] font-medium hover:opacity-80 transition-opacity"
                                     style={{ background: "rgba(196,113,74,0.08)", color: "#C4714A" }}
                                 >
                                     <Paperclip size={11} />
-                                    <span className="truncate max-w-48">{comment.attachmentName ?? "Attachment"}</span>
+                                    <span className="truncate max-w-48">
+                                        {comment.attachmentName ?? "Attachment"}
+                                    </span>
                                     <Download size={11} className="shrink-0" />
                                 </a>
                             )}
@@ -124,9 +128,7 @@ export function CommentCard({ comment, onUpdate, onDelete }) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete comment?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This can't be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>This can't be undone.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -6,6 +6,7 @@ import { CommentCard } from "./CommentCard";
 import { CommentForm } from "./CommentForm";
 import { useComments } from "../../hooks/useComments"
 import { useCanComment } from "../../hooks/useCanComment";
+import { useMentionableUsers } from "../../hooks/useMentionableUsers";
 function CommentsSkeleton() {
     return (
         <div className="space-y-4 py-2">
@@ -26,6 +27,7 @@ function CommentsSkeleton() {
 export function CommentsSection({ incidentId, reporter, assignees}) {
     const { comments, loading, submitComment, updateComment, removeComment } = useComments(incidentId);
     const bottomRef = useRef(null);
+    const mentionableUsers = useMentionableUsers(incidentId);
     const canComment = useCanComment(reporter,assignees);
     useEffect(() => {
         if (!loading) {
@@ -62,7 +64,6 @@ export function CommentsSection({ incidentId, reporter, assignees}) {
                     </p>
                 </div>
             ) : (
-                <ScrollArea className="max-h-72">
                     <div>
                         {comments.map((comment) => (
                             <CommentCard
@@ -70,14 +71,14 @@ export function CommentsSection({ incidentId, reporter, assignees}) {
                                 comment={comment}
                                 onUpdate={updateComment}
                                 onDelete={removeComment}
+                                mentionableUsers={mentionableUsers}
                             />
                         ))}
                         <div ref={bottomRef} />
                     </div>
-                </ScrollArea>
             )}
             {canComment &&
-            <CommentForm onSubmit={submitComment}/>}
+            <CommentForm onSubmit={submitComment} mentionableUsers={mentionableUsers}/>}
             
         </div>
     );

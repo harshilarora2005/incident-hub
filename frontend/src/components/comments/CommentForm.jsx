@@ -1,13 +1,22 @@
 import { useState, useRef } from "react";
 import { Paperclip, X, CornerDownLeft } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { MentionTextarea } from "./MentionTextarea";
 import { cn } from "@/lib/utils";
-export function CommentForm({ onSubmit, initialContent = "", initialFile = null, submitLabel = "Comment", onCancel}) {
+
+export function CommentForm({
+    onSubmit,
+    initialContent = "",
+    submitLabel = "Comment",
+    onCancel,
+    mentionableUsers = [],
+}) {
     const [content, setContent] = useState(initialContent);
-    const [file, setFile] = useState(initialFile);
+    const [file, setFile] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const fileRef = useRef(null);
+
     const canSubmit = content.trim().length > 0 && !submitting;
+
     const handleSubmit = async () => {
         if (!canSubmit) return;
         setSubmitting(true);
@@ -29,15 +38,17 @@ export function CommentForm({ onSubmit, initialContent = "", initialFile = null,
     };
 
     return (
-        <div className="rounded-xl border border-[rgba(138,155,170,0.25)] bg-white overflow-hidden">
-            <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Add a comment… (Ctrl+Enter to submit)"
-                rows={3}
-                className="resize-none border-0 shadow-none ring-0 focus-visible:ring-0 rounded-none text-[13px] text-[#111D28] placeholder:text-[#8A9BAA] px-3 pt-3 pb-1"
-            />
+        <div className="rounded-xl border border-[rgba(138,155,170,0.25)] bg-white overflow-visible">
+            <div className="px-3 pt-3 pb-1">
+                <MentionTextarea
+                    value={content}
+                    onChange={setContent}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Add a comment… type @ to mention someone (Ctrl+Enter to submit)"
+                    rows={3}
+                    mentionableUsers={mentionableUsers}
+                />
+            </div>
             {file && (
                 <div className="mx-3 mb-2 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[rgba(196,113,74,0.08)] w-fit">
                     <Paperclip size={12} style={{ color: "#C4714A" }} />
