@@ -58,12 +58,12 @@ export function useComments(incidentId) {
             }
 
             try {
-                const created = await addComment(incidentId, {
+                await addComment(incidentId, {
                     content,
                     attachmentUrl,
                     attachmentName,
                 });
-                setComments((prev) => [...prev, created]);
+                // setComments((prev) => [...prev, created]);
             } catch {
                 toast.error("Failed to post comment");
             }
