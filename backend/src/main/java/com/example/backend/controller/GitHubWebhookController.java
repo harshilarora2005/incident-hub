@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dtos.GitHubRecords.*;
 import com.example.backend.service.GitHubWebhookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,11 @@ public class GitHubWebhookController {
 
     @Value("${github.webhook.secret}")
     private String webhookSecret;
+
+    @PostConstruct
+    public void debugSecret() {
+        log.info("Webhook secret loaded, length={}", webhookSecret.length());
+    }
 
     @PostMapping
     public ResponseEntity<Void> handle(

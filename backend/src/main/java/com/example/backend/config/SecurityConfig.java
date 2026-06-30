@@ -74,6 +74,7 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/logout",
+                                "/api/webhooks/github",
                                 "/ws/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
