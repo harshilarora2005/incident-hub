@@ -4,7 +4,6 @@ import com.example.backend.dtos.GitHubRecords.*;
 import com.example.backend.entity.AuditAction;
 import com.example.backend.entity.Incident;
 import com.example.backend.entity.User;
-import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.repository.IncidentRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.utils.IncidentRefUtils;
@@ -16,12 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GitHubWebhookService {
+
+    private static final String URL_MARKER = "__url__:";
 
     private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
@@ -38,8 +41,8 @@ public class GitHubWebhookService {
         botUser = userRepository.findByEmail(botEmail)
                 .orElseThrow(() -> new IllegalStateException(
                         "GitHub bot user not seeded — check Seeder ran with app.github-bot.email=" + botEmail));
+        log.info("GitHub bot user loaded: id={}, email={}", botUser.getId(), botUser.getEmail());
     }
-
     @Transactional
     public void handlePush(PushPayload payload) {
         Long incidentId = IncidentRefUtils.extractFromBranch(payload.ref());
@@ -47,16 +50,31 @@ public class GitHubWebhookService {
         if (incident == null) return;
 
         String pusherName = payload.pusher() != null ? payload.pusher().name() : "Someone";
-        int commitCount = payload.commits() != null ? payload.commits().size() : 0;
-        if (commitCount == 0) return;
+        List<PushPayload.Commit> commits = payload.commits() != null ? payload.commits() : List.of();
+        if (commits.isEmpty()) return;
 
-        String summary = pusherName + " pushed " + commitCount +
-                (commitCount == 1 ? " commit" : " commits");
+        String branch = payload.ref().replace("refs/heads/", "");
+
+        String commitLines = commits.stream()
+                .limit(3)
+                .map(c -> "• " + shortSha(c.id()) + " " + firstLine(c.message()))
+                .collect(Collectors.joining("\n"));
+
+        if (commits.size() > 3) {
+            commitLines += "\n…and " + (commits.size() - 3) + " more";
+        }
+
+        String summary = pusherName + " pushed " + commits.size() +
+                (commits.size() == 1 ? " commit" : " commits") + " to " + branch;
+
+        String latestUrl = commits.get(commits.size() - 1).url();
+        String detail = summary + "\n" + commitLines +
+                (latestUrl != null ? "\n" + URL_MARKER + latestUrl : "");
 
         auditService.log(incident.getId(), incident.getTitle(), botUser,
-                AuditAction.GITHUB_PUSH, null, summary);
+                AuditAction.GITHUB_PUSH, branch, detail);
 
-        notifyWatchers(incident, "GitHub activity", summary + " to " + incident.getTitle());
+        notifyWatchers(incident, "GitHub activity", summary);
     }
 
     @Transactional
@@ -85,8 +103,15 @@ public class GitHubWebhookService {
             default -> { return; }
         }
 
+        String bodyPreview = pr.body() != null && !pr.body().isBlank()
+                ? "\n" + firstLine(pr.body().strip())
+                : "";
+
+        String detail = summary + bodyPreview +
+                (pr.htmlUrl() != null ? "\n" + URL_MARKER + pr.htmlUrl() : "");
+
         auditService.log(incident.getId(), incident.getTitle(), botUser,
-                action, null, pr.htmlUrl());
+                action, null, detail);
 
         notifyWatchers(incident, "GitHub activity", summary);
     }
@@ -101,5 +126,15 @@ public class GitHubWebhookService {
         recipients.forEach(user ->
                 notificationService.send(title, message, incident.getId(), user, botUser)
         );
+    }
+
+    private String shortSha(String sha) {
+        return sha != null && sha.length() >= 7 ? sha.substring(0, 7) : sha;
+    }
+
+    private String firstLine(String message) {
+        if (message == null) return "";
+        int idx = message.indexOf('\n');
+        return idx > 0 ? message.substring(0, idx) : message;
     }
 }

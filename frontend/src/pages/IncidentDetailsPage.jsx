@@ -121,7 +121,7 @@ export default function IncidentDetailsPage({ incident, onUpdated }) {
                     <div>
                         <p className="text-[13px] font-semibold mb-4" style={{ color: "#111D28" }}>Timeline</p>
                         <TimelineEvent label="Incident created" date={formatDate(incident.createdAt)} dot="#8A9BAA" />
-                        <TimelineEvent label="Last updated"     date={formatDate(incident.updatedAt)} dot="#C4714A" />
+                        <TimelineEvent label="Last updated"date={formatDate(incident.updatedAt)} dot="#C4714A" />
                         {incident.resolvedAt && (
                             <TimelineEvent label="Resolved" date={formatDate(incident.resolvedAt)} dot="#22c55e" />
                         )}
