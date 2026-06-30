@@ -1,14 +1,19 @@
-import { Calendar, Flag, Layers3 } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Flag, Layers3, MessageSquare, History } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import TimelineEvent from "../components/TimelineEvent";
 import { StatusBadge, PriorityBadge } from "../components/Badges";
 import { UserRow } from "../components/AssigneeFleet";
 import { PROGRESS_BAR_COLOR, PRIORITY_CONFIG, CATEGORY_CONFIG } from "../assets/constants/incidentStyles";
 import { useIncidentEdit } from "../hooks/useIncidentEdit";
-import { EditableTitle, EditableDescription,EditableDueDate } from "../components/EditableFields";
+import { useIncidentActivity } from "../hooks/useIncidentActivity";
+import { EditableTitle, EditableDescription, EditableDueDate } from "../components/EditableFields";
 import { InlineSelect } from "../components/InlineSelect";
 import AssigneeSelect from "../components/AssigneeSelect";
 import { CommentsSection } from "../components/comments/CommentsSection";
+import { ActivityFeed } from "../components/dashboard/ActivityFeed";
+import { cn } from "@/lib/utils";
+
 const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
@@ -37,9 +42,37 @@ function SidebarField({ icon: Icon, label, children }) {
     );
 }
 
+function PanelTab({ active, onClick, icon: Icon, label, count }) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors",
+                active
+                    ? "bg-[rgba(196,113,74,0.1)] text-[#C4714A]"
+                    : "text-[#8A9BAA] hover:text-[#111D28] hover:bg-[rgba(138,155,170,0.08)]"
+            )}
+        >
+            <Icon size={13} />
+            {label}
+            {count > 0 && (
+                <span
+                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                    style={{ background: "rgba(138,155,170,0.15)", color: "#8A9BAA" }}
+                >
+                    {count}
+                </span>
+            )}
+        </button>
+    );
+}
+
 export default function IncidentDetailsPage({ incident, onUpdated }) {
     const { draft, save } = useIncidentEdit(incident, onUpdated);
+    const [panel, setPanel] = useState("comments"); // "comments" | "activity"
+    const { logs, loading: activityLoading } = useIncidentActivity(incident.id, panel === "activity");
     const progress = incident.progress ?? 0;
+
     return (
         <div className="flex flex-col h-full max-h-[85vh] overflow-hidden bg-white rounded-xl">
             <div
@@ -88,12 +121,44 @@ export default function IncidentDetailsPage({ incident, onUpdated }) {
                     <div>
                         <p className="text-[13px] font-semibold mb-4" style={{ color: "#111D28" }}>Timeline</p>
                         <TimelineEvent label="Incident created" date={formatDate(incident.createdAt)} dot="#8A9BAA" />
-                        <TimelineEvent label="Last updated"     date={formatDate(incident.updatedAt)} dot="#C4714A" />
+                        <TimelineEvent label="Last updated"date={formatDate(incident.updatedAt)} dot="#C4714A" />
                         {incident.resolvedAt && (
                             <TimelineEvent label="Resolved" date={formatDate(incident.resolvedAt)} dot="#22c55e" />
                         )}
-                        <Separator style={{ background: "rgba(138,155,170,0.15)" }} />
-                        <CommentsSection incidentId={incident.id} reporter={incident.reporter.id} assignees={incident.assignees?.map((a) => a.id) ?? []}/>
+                    </div>
+
+                    <Separator style={{ background: "rgba(138,155,170,0.15)" }} />
+
+                    <div>
+                        <div className="flex items-center gap-1 mb-4">
+                            <PanelTab
+                                active={panel === "comments"}
+                                onClick={() => setPanel("comments")}
+                                icon={MessageSquare}
+                                label="Comments"
+                            />
+                            <PanelTab
+                                active={panel === "activity"}
+                                onClick={() => setPanel("activity")}
+                                icon={History}
+                                label="Activity"
+                                count={logs.length}
+                            />
+                        </div>
+
+                        {panel === "comments" ? (
+                            <CommentsSection
+                                incidentId={incident.id}
+                                reporter={incident.reporter.id}
+                                assignees={incident.assignees?.map((a) => a.id) ?? []}
+                            />
+                        ) : activityLoading ? (
+                            <p className="text-[12px] py-4 text-center" style={{ color: "#8A9BAA" }}>
+                                Loading activity…
+                            </p>
+                        ) : (
+                            <ActivityFeed logs={logs} />
+                        )}
                     </div>
                 </div>
                 <div className="w-55 shrink-0 overflow-y-auto px-5 py-5 space-y-5" style={{ background: "#FAFAF7" }}>

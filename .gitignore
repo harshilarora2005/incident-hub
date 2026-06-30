@@ -5,3 +5,4 @@ service-registry
 gateway
 config-server
 backend.zip
+incident-hub-test-target

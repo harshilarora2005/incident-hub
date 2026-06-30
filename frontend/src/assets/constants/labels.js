@@ -23,4 +23,8 @@ export const ACTION_LABELS = {
     DUE_DATE_CHANGED:{ label: "changed due date", color: "#8A9BAA" },
     ASSIGNEE_ADDED:{ label: "assigned",color: "#3b82f6" },
     ASSIGNEE_REMOVED:{ label: "unassigned",color: "#a855f7" },
+    GITHUB_PUSH:{ label: "pushed commits", color: "#24292e" },
+    GITHUB_PR_OPENED:{ label: "opened a PR", color: "#1f883d" },
+    GITHUB_PR_MERGED:{ label: "merged a PR", color: "#8250df" },
+    GITHUB_PR_CLOSED:{ label: "closed a PR", color: "#cf222e" },
 };

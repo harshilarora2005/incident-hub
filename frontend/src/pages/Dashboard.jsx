@@ -127,9 +127,8 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Activity feed */}
             <DashboardCard title="Recent activity">
-                <ScrollArea className="max-h-80">
+                <ScrollArea >
                     <ActivityFeed logs={auditLogs} />
                 </ScrollArea>
             </DashboardCard>

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component
@@ -20,15 +21,29 @@ public class Seeder implements CommandLineRunner {
     @Value("${app.admin.email}") String email;
     @Value("${app.admin.password}") String password;
     @Value("${app.admin.name}") String name;
+
+    @Value("${app.github-bot.email}") String botEmail;
+    @Value("${app.github-bot.name}") String botName;
+
     @Override
     public void run(String... args) throws Exception {
-        if (users.findByEmail(email).isPresent()) {
-            return;
+        if (users.findByEmail(email).isEmpty()) {
+            users.save(User.builder()
+                    .email(email).name(name).passwordHash(enc.encode(password))
+                    .roles(new HashSet<>(Set.of(Role.ADMIN, Role.MANAGER, Role.ENGINEER)))
+                    .build());
+            System.out.println("[Seeder] admin user created: " + email);
         }
-        users.save(User.builder()
-                .email(email).name(name).passwordHash(enc.encode(password))
-                .roles(new HashSet<>(Set.of(Role.ADMIN, Role.MANAGER, Role.ENGINEER)))
-                .build());
-        System.out.println("[Seeder] admin user created: " + email);
+
+        if (users.findByEmail(botEmail).isEmpty()) {
+            users.save(User.builder()
+                    .email(botEmail)
+                    .name(botName)
+                    .passwordHash(enc.encode(UUID.randomUUID().toString()))
+                    .avatarUrl("https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png")
+                    .roles(new HashSet<>())
+                    .build());
+            System.out.println("[Seeder] GitHub bot user created: " + botEmail);
+        }
     }
 }
