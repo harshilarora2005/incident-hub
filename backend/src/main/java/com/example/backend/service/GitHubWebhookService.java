@@ -4,10 +4,14 @@ import com.example.backend.dtos.GitHubRecords.*;
 import com.example.backend.entity.AuditAction;
 import com.example.backend.entity.Incident;
 import com.example.backend.entity.User;
+import com.example.backend.exception.CustomExceptionHandler;
 import com.example.backend.repository.IncidentRepository;
+import com.example.backend.repository.UserRepository;
 import com.example.backend.utils.IncidentRefUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +24,21 @@ import java.util.Set;
 public class GitHubWebhookService {
 
     private final IncidentRepository incidentRepository;
+    private final UserRepository userRepository;
     private final AuditService auditService;
     private final NotificationService notificationService;
+
+    @Value("${app.github-bot.email}")
+    private String botEmail;
+
+    private User botUser;
+
+    @PostConstruct
+    private void loadBotUser() {
+        botUser = userRepository.findByEmail(botEmail)
+                .orElseThrow(() -> new IllegalStateException(
+                        "GitHub bot user not seeded — check Seeder ran with app.github-bot.email=" + botEmail));
+    }
 
     @Transactional
     public void handlePush(PushPayload payload) {
@@ -36,10 +53,8 @@ public class GitHubWebhookService {
         String summary = pusherName + " pushed " + commitCount +
                 (commitCount == 1 ? " commit" : " commits");
 
-        auditService.log(
-                incident.getId(), incident.getTitle(), systemActor(incident),
-                AuditAction.GITHUB_PUSH, null, summary
-        );
+        auditService.log(incident.getId(), incident.getTitle(), botUser,
+                AuditAction.GITHUB_PUSH, null, summary);
 
         notifyWatchers(incident, "GitHub activity", summary + " to " + incident.getTitle());
     }
@@ -67,12 +82,10 @@ public class GitHubWebhookService {
                 action = merged ? AuditAction.GITHUB_PR_MERGED : AuditAction.GITHUB_PR_CLOSED;
                 summary = (merged ? "Merged PR #" : "Closed PR #") + pr.number() + ": " + pr.title();
             }
-            default -> {
-                return;
-            }
+            default -> { return; }
         }
 
-        auditService.log(incident.getId(), incident.getTitle(), systemActor(incident),
+        auditService.log(incident.getId(), incident.getTitle(), botUser,
                 action, null, pr.htmlUrl());
 
         notifyWatchers(incident, "GitHub activity", summary);
@@ -82,15 +95,11 @@ public class GitHubWebhookService {
         return incidentRepository.findById(id).orElse(null);
     }
 
-    private User systemActor(Incident incident) {
-        return incident.getReporter();
-    }
-
     private void notifyWatchers(Incident incident, String title, String message) {
         Set<User> recipients = new HashSet<>(incident.getAssignees());
         recipients.add(incident.getReporter());
         recipients.forEach(user ->
-                notificationService.send(title, message, incident.getId(), user, incident.getReporter())
+                notificationService.send(title, message, incident.getId(), user, botUser)
         );
     }
 }
