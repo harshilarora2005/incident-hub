@@ -105,7 +105,6 @@ export default function UsersPage() {
 
     return (
         <div className="p-6 min-h-full" style={{ background: "#F0EDE8" }}>
-            {/* Header */}
             <div className="flex items-center justify-between mb-5">
                 <div>
                     <p
@@ -173,7 +172,6 @@ export default function UsersPage() {
                     </p>
                 </div>
 
-                {/* Rows */}
                 {loading ? (
                     [...Array(5)].map((_, i) => <UserRowSkeleton key={i} />)
                 ) : filtered.length === 0 ? (
