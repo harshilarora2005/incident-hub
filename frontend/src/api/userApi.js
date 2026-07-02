@@ -1,13 +1,19 @@
 import api from "./axios";
+
 export const getAllUsers = async () => {
     const response = await api.get("/users");
     return response.data;
 };
 
-export const updateUserName = async (username) => {
-    const response = await api.patch("users/me/name",username);
+export const inviteUser = async (payload) => {
+    const response = await api.post("/users/invite", payload);
     return response.data;
-}
+};
+
+export const updateUserName = async (username) => {
+    const response = await api.patch("users/me/name", username);
+    return response.data;
+};
 
 export const uploadAvatar = async (file) => {
     const form = new FormData();

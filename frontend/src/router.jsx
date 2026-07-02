@@ -8,6 +8,8 @@ import DashboardLayout from "./layout/DashboardLayout";
 import IncidentsPage from "./pages/Incidents";
 import ReportIncident from "./pages/ReportIncident";
 import AccountPage from "./pages/AccountPage";
+import UsersPage from "./pages/UsersPage";
+
 const router = createBrowserRouter([
     {
         element: <App />,
@@ -32,11 +34,15 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: "/incidents",
-                                element: <IncidentsPage/>,
+                                element: <IncidentsPage />,
                             },
                             {
                                 path: "/account",
-                                element: <AccountPage/>,
+                                element: <AccountPage />,
+                            },
+                            {
+                                path: "/users",
+                                element: <UsersPage />,
                             },
                             {
                                 path: "/settings",
@@ -44,8 +50,8 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: "/report-incident",
-                                element: <ReportIncident/>
-                            }
+                                element: <ReportIncident />,
+                            },
                         ],
                     },
                 ],
