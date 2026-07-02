@@ -35,6 +35,13 @@ public class EmailService {
         sendEmail(to, subject, html);
     }
 
+    @Async
+    public void sendInviteEmail(String to, String name, String tempPassword) throws MessagingException {
+        String subject = "You've been invited to Incident Hub";
+        String html = buildInviteEmail(name, tempPassword);
+        sendEmail(to, subject, html);
+    }
+
     private String buildWelcomeEmail(String name) {
         return """
             <!DOCTYPE html>
@@ -58,7 +65,6 @@ public class EmailService {
                       </tr>
                       <tr>
                         <td style="padding:44px 40px 36px;">
-
                           <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#C4714A;">
                             Account Created
                           </p>
@@ -68,8 +74,6 @@ public class EmailService {
                           <p style="margin:0 0 28px;font-size:15px;color:#5A6E7F;line-height:1.7;">
                             Your IncidentHub account is ready. You can now view tickets, resolve them & send live comments.
                           </p>
-
-                          <!-- CTA button -->
                           <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                             <tr>
                               <td style="background-color:#1C2B3A;border-radius:12px;">
@@ -80,9 +84,8 @@ public class EmailService {
                               </td>
                             </tr>
                           </table>
-
-         
-                      <!-- Footer -->
+                        </td>
+                      </tr>
                       <tr>
                         <td style="background-color:#F5F0E8;padding:24px 40px;text-align:center;border-top:1px solid #DDD8CE;">
                           <p style="margin:0 0 4px;font-size:11px;color:#8A9BAA;">
@@ -93,7 +96,6 @@ public class EmailService {
                           </p>
                         </td>
                       </tr>
-
                     </table>
                   </td>
                 </tr>
@@ -101,5 +103,72 @@ public class EmailService {
             </body>
             </html>
             """.formatted(name);
+    }
+
+    private String buildInviteEmail(String name, String tempPassword) {
+        return """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8"/>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+              <title>You've been invited to Incident Hub</title>
+            </head>
+            <body style="margin:0;padding:0;background-color:#111D28;font-family:'Segoe UI',Arial,sans-serif;">
+              <table width="100%%" cellpadding="0" cellspacing="0" style="background-color:#111D28;padding:48px 16px;">
+                <tr>
+                  <td align="center">
+                    <table width="100%%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#FAFAF7;border-radius:24px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.4);">
+                      <tr>
+                        <td style="background-color:#1C2B3A;padding:36px 40px 32px;text-align:center;">
+                          <div style="display:inline-block;background:#C4714A;border-radius:14px;padding:10px 22px;">
+                            <span style="font-size:22px;font-weight:700;color:#FAFAF7;letter-spacing:0.04em;">Incident Hub</span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:44px 40px 36px;">
+                          <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#C4714A;">
+                            You're invited
+                          </p>
+                          <h1 style="margin:0 0 16px;font-size:30px;font-weight:400;color:#1C2B3A;line-height:1.2;">
+                            Hi <strong style="font-weight:700;">%s</strong>,<br/>your account is ready.
+                          </h1>
+                          <p style="margin:0 0 20px;font-size:15px;color:#5A6E7F;line-height:1.7;">
+                            An admin has added you to IncidentHub. Sign in with your email and the temporary password below, then change it from your account settings.
+                          </p>
+                          <div style="background:#F5F0E8;border-radius:12px;padding:16px 24px;margin-bottom:28px;border-left:4px solid #C4714A;">
+                            <p style="margin:0 0 4px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#8A9BAA;">Temporary password</p>
+                            <p style="margin:0;font-size:20px;font-weight:700;font-family:monospace;color:#1C2B3A;letter-spacing:0.08em;">%s</p>
+                          </div>
+                          <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                            <tr>
+                              <td style="background-color:#1C2B3A;border-radius:12px;">
+                                <a href="http://localhost:5173/login"
+                                   style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:600;color:#FAFAF7;text-decoration:none;letter-spacing:0.04em;">
+                                  Sign in to IncidentHub →
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="background-color:#F5F0E8;padding:24px 40px;text-align:center;border-top:1px solid #DDD8CE;">
+                          <p style="margin:0 0 4px;font-size:11px;color:#8A9BAA;">
+                            You're receiving this because an admin added you to IncidentHub.
+                          </p>
+                          <p style="margin:0;font-size:11px;color:#8A9BAA;">
+                            © 2026 IncidentHub · All rights reserved
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
+            """.formatted(name, tempPassword);
     }
 }
